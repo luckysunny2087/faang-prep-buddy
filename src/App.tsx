@@ -17,6 +17,7 @@ import Practice from "./pages/Practice";
 import Interview from "./pages/Interview";
 import Dashboard from "./pages/Dashboard";
 import Results from "./pages/Results";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/interview" element={<Interview />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/results" element={<Results />} />
+              <Route path="/auth" element={<Auth />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
