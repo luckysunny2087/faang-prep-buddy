@@ -15,6 +15,8 @@ import { InterviewProvider } from "@/contexts/InterviewContext";
 import Index from "./pages/Index";
 import Practice from "./pages/Practice";
 import Interview from "./pages/Interview";
+import Dashboard from "./pages/Dashboard";
+import Results from "./pages/Results";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/practice" element={<Practice />} />
               <Route path="/interview" element={<Interview />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/results" element={<Results />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
