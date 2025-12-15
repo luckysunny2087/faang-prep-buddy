@@ -12,6 +12,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { InterviewProvider } from "@/contexts/InterviewContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Practice from "./pages/Practice";
 import Interview from "./pages/Interview";
@@ -32,10 +33,10 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/practice" element={<Practice />} />
-              <Route path="/interview" element={<Interview />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/results" element={<Results />} />
+              <Route path="/practice" element={<ProtectedRoute><Practice /></ProtectedRoute>} />
+              <Route path="/interview" element={<ProtectedRoute><Interview /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/results" element={<ProtectedRoute><Results /></ProtectedRoute>} />
               <Route path="/auth" element={<Auth />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
