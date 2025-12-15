@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { useInterview } from '@/contexts/InterviewContext';
@@ -17,12 +17,14 @@ export default function Interview() {
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState<{ score: number; feedback: string; strengths: string[]; improvements: string[] } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const startTimeRef = useRef<Date>(new Date());
 
   useEffect(() => {
     if (!currentSession) {
       navigate('/practice');
       return;
     }
+    startTimeRef.current = new Date();
     if (currentSession.questions.length === 0) {
       generateQuestion();
     }
@@ -83,13 +85,70 @@ export default function Interview() {
     }
   };
 
-  const handleNext = () => {
+  const saveSessionToDatabase = async () => {
+    if (!currentSession) return;
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const totalQuestions = currentSession.answers.length;
+      const avgScore = totalQuestions > 0 
+        ? Math.round(currentSession.answers.reduce((sum, a) => sum + (a.score || 0), 0) / totalQuestions)
+        : 0;
+      const correctAnswers = currentSession.answers.filter(a => (a.score || 0) >= 7).length;
+      const durationMinutes = Math.round((new Date().getTime() - startTimeRef.current.getTime()) / 60000);
+
+      // Save interview session
+      await supabase.from('interview_sessions').insert({
+        user_id: user.id,
+        technology: currentSession.technology,
+        role: currentSession.role,
+        level: currentSession.level,
+        company: currentSession.company || null,
+        question_types: currentSession.questionTypes,
+        total_questions: totalQuestions,
+        correct_answers: correctAnswers,
+        score: avgScore,
+        duration_minutes: durationMinutes,
+      });
+
+      // Update profile stats
+      const today = new Date().toISOString().split('T')[0];
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('total_sessions, total_questions, current_streak, longest_streak, last_practice_date')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profile) {
+        const lastPractice = profile.last_practice_date;
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        const newStreak = lastPractice === yesterday ? (profile.current_streak || 0) + 1 
+          : lastPractice === today ? (profile.current_streak || 0) 
+          : 1;
+
+        await supabase.from('profiles').update({
+          total_sessions: (profile.total_sessions || 0) + 1,
+          total_questions: (profile.total_questions || 0) + totalQuestions,
+          current_streak: newStreak,
+          longest_streak: Math.max(profile.longest_streak || 0, newStreak),
+          last_practice_date: today,
+        }).eq('user_id', user.id);
+      }
+    } catch (err) {
+      console.error('Failed to save session:', err);
+    }
+  };
+
+  const handleNext = async () => {
     setUserAnswer('');
     setFeedback(null);
     if (currentQuestionIndex < 9) {
       nextQuestion();
       generateQuestion();
     } else {
+      await saveSessionToDatabase();
       endSession();
       navigate('/results');
     }
