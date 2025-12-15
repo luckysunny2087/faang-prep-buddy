@@ -1,10 +1,10 @@
 import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useDashboardData } from "@/hooks/useDashboardData";
 import { 
   Target, 
   TrendingUp, 
@@ -36,58 +36,46 @@ import {
   Bar,
 } from "recharts";
 
-// Mock data for demonstration
-const performanceData = [
-  { date: "Week 1", score: 65 },
-  { date: "Week 2", score: 72 },
-  { date: "Week 3", score: 68 },
-  { date: "Week 4", score: 78 },
-  { date: "Week 5", score: 82 },
-  { date: "Week 6", score: 85 },
-];
-
-const skillsData = [
-  { skill: "Technical", value: 78, fullMark: 100 },
-  { skill: "Behavioral", value: 85, fullMark: 100 },
-  { skill: "System Design", value: 65, fullMark: 100 },
-  { skill: "Domain", value: 72, fullMark: 100 },
-];
-
-const companyReadiness = [
-  { company: "Amazon", readiness: 75 },
-  { company: "Google", readiness: 68 },
-  { company: "Meta", readiness: 72 },
-  { company: "Apple", readiness: 60 },
-  { company: "Netflix", readiness: 65 },
-  { company: "Microsoft", readiness: 82 },
-];
-
-const recentSessions = [
-  { id: 1, date: "Dec 8, 2024", type: "Technical", company: "Amazon", score: 85 },
-  { id: 2, date: "Dec 7, 2024", type: "System Design", company: "Google", score: 72 },
-  { id: 3, date: "Dec 6, 2024", type: "Behavioral", company: "Meta", score: 90 },
+const defaultSkillsData = [
+  { skill: "Technical", value: 0, fullMark: 100 },
+  { skill: "Behavioral", value: 0, fullMark: 100 },
+  { skill: "System Design", value: 0, fullMark: 100 },
+  { skill: "Domain", value: 0, fullMark: 100 },
 ];
 
 const achievements = [
-  { id: 1, name: "First Interview", icon: Trophy, unlocked: true, description: "Complete your first practice session" },
-  { id: 2, name: "Week Warrior", icon: Flame, unlocked: true, description: "7-day practice streak" },
-  { id: 3, name: "Tech Master", icon: Code, unlocked: true, description: "Score 90%+ on technical questions" },
-  { id: 4, name: "FAANG Ready", icon: Star, unlocked: false, description: "Pass mock interviews for all FAANG companies" },
+  { id: 1, name: "First Interview", icon: Trophy, threshold: 1, description: "Complete your first practice session" },
+  { id: 2, name: "Week Warrior", icon: Flame, threshold: 7, description: "7-day practice streak" },
+  { id: 3, name: "Tech Master", icon: Code, threshold: 90, description: "Score 90%+ on technical questions" },
+  { id: 4, name: "FAANG Ready", icon: Star, threshold: 6, description: "Practice with all FAANG companies" },
 ];
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { loading, stats, recentSessions, skillsData, performanceData, companyReadiness } = useDashboardData();
   
-  // Mock user stats
-  const stats = {
-    totalSessions: 24,
-    averageScore: 78,
-    currentStreak: 5,
-    longestStreak: 12,
-    questionsAnswered: 186,
-    hoursSpent: 18,
+  const displaySkills = skillsData.length > 0 ? skillsData : defaultSkillsData;
+  
+  // Calculate achievement status
+  const getAchievementStatus = (id: number) => {
+    switch (id) {
+      case 1: return stats.totalSessions >= 1;
+      case 2: return stats.currentStreak >= 7;
+      case 3: return skillsData.find(s => s.skill === "Technical")?.value >= 90;
+      case 4: return companyReadiness.length >= 6;
+      default: return false;
+    }
   };
 
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </Layout>
+    );
+  }
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-8">
@@ -171,27 +159,33 @@ export default function Dashboard() {
                   <CardDescription>Your score progression over time</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <LineChart data={performanceData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                      <XAxis dataKey="date" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                      <YAxis domain={[0, 100]} className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="score" 
-                        stroke="hsl(var(--primary))" 
-                        strokeWidth={3}
-                        dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  {performanceData.length === 0 ? (
+                    <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+                      Complete sessions to see your progress trend
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={250}>
+                      <LineChart data={performanceData}>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                        <XAxis dataKey="date" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <YAxis domain={[0, 100]} className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--card))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px'
+                          }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="score" 
+                          stroke="hsl(var(--primary))" 
+                          strokeWidth={3}
+                          dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -209,7 +203,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={250}>
-                    <RadarChart data={skillsData}>
+                    <RadarChart data={displaySkills}>
                       <PolarGrid stroke="hsl(var(--border))" />
                       <PolarAngleAxis dataKey="skill" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
                       <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
@@ -241,21 +235,27 @@ export default function Dashboard() {
                   <CardDescription>Your preparation level for each company</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={companyReadiness} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                      <XAxis type="number" domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                      <YAxis dataKey="company" type="category" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} width={70} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Bar dataKey="readiness" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {companyReadiness.length === 0 ? (
+                    <div className="h-[200px] flex items-center justify-center text-muted-foreground">
+                      Practice with companies to see readiness scores
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart data={companyReadiness} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                        <XAxis type="number" domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <YAxis dataKey="company" type="category" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} width={70} />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--card))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px'
+                          }}
+                        />
+                        <Bar dataKey="readiness" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -273,27 +273,32 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {recentSessions.map((session) => (
-                      <div
-                        key={session.id}
-                        className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            {session.type === "Technical" && <Code className="w-5 h-5 text-primary" />}
-                            {session.type === "System Design" && <Lightbulb className="w-5 h-5 text-primary" />}
-                            {session.type === "Behavioral" && <Users className="w-5 h-5 text-primary" />}
+                    {recentSessions.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-6">No sessions yet. Start practicing!</p>
+                    ) : (
+                      recentSessions.map((session) => (
+                        <div
+                          key={session.id}
+                          className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              {session.type === "Technical" && <Code className="w-5 h-5 text-primary" />}
+                              {session.type === "System Design" && <Lightbulb className="w-5 h-5 text-primary" />}
+                              {session.type === "Behavioral" && <Users className="w-5 h-5 text-primary" />}
+                              {!["Technical", "System Design", "Behavioral"].includes(session.type) && <Brain className="w-5 h-5 text-primary" />}
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm text-foreground">{session.type}</p>
+                              <p className="text-xs text-muted-foreground">{session.company || "General"} • {session.date}</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium text-sm text-foreground">{session.type}</p>
-                            <p className="text-xs text-muted-foreground">{session.company} • {session.date}</p>
-                          </div>
+                          <Badge variant={session.score >= 80 ? "default" : "secondary"}>
+                            {session.score}%
+                          </Badge>
                         </div>
-                        <Badge variant={session.score >= 80 ? "default" : "secondary"}>
-                          {session.score}%
-                        </Badge>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                   <Button variant="ghost" className="w-full mt-4" size="sm">
                     View All Sessions <ChevronRight className="w-4 h-4 ml-1" />
@@ -316,24 +321,27 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {achievements.map((achievement) => (
-                    <div
-                      key={achievement.id}
-                      className={`p-4 rounded-lg text-center transition-all ${
-                        achievement.unlocked 
-                          ? "bg-primary/10 border border-primary/30" 
-                          : "bg-muted/50 opacity-50"
-                      }`}
-                    >
-                      <achievement.icon 
-                        className={`w-8 h-8 mx-auto mb-2 ${
-                          achievement.unlocked ? "text-primary" : "text-muted-foreground"
-                        }`} 
-                      />
-                      <p className="font-medium text-sm text-foreground">{achievement.name}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{achievement.description}</p>
-                    </div>
-                  ))}
+                  {achievements.map((achievement) => {
+                    const unlocked = getAchievementStatus(achievement.id);
+                    return (
+                      <div
+                        key={achievement.id}
+                        className={`p-4 rounded-lg text-center transition-all ${
+                          unlocked 
+                            ? "bg-primary/10 border border-primary/30" 
+                            : "bg-muted/50 opacity-50"
+                        }`}
+                      >
+                        <achievement.icon 
+                          className={`w-8 h-8 mx-auto mb-2 ${
+                            unlocked ? "text-primary" : "text-muted-foreground"
+                          }`} 
+                        />
+                        <p className="font-medium text-sm text-foreground">{achievement.name}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{achievement.description}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>

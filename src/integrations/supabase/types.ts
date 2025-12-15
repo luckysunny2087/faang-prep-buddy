@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      interview_sessions: {
+        Row: {
+          company: string | null
+          correct_answers: number
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          level: string
+          question_types: string[]
+          role: string
+          score: number
+          technology: string
+          total_questions: number
+          user_id: string
+        }
+        Insert: {
+          company?: string | null
+          correct_answers?: number
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          level: string
+          question_types?: string[]
+          role: string
+          score?: number
+          technology: string
+          total_questions?: number
+          user_id: string
+        }
+        Update: {
+          company?: string | null
+          correct_answers?: number
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          level?: string
+          question_types?: string[]
+          role?: string
+          score?: number
+          technology?: string
+          total_questions?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
