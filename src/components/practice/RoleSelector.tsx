@@ -2,11 +2,11 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Role } from '@/types/interview';
 import { roles } from '@/data/technologies';
-import { Code, Server, Users, BarChart } from 'lucide-react';
+import { Code, Server, Users, BarChart, ClipboardCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Code, Server, Users, BarChart,
+  Code, Server, Users, BarChart, ClipboardCheck,
 };
 
 interface RoleSelectorProps {

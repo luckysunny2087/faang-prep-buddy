@@ -20,6 +20,46 @@ export const technologies: Technology[] = [
   { id: 'eks', name: 'Amazon EKS', category: 'aws', icon: 'Box', description: 'Managed Kubernetes service' },
   { id: 'cloudfront', name: 'CloudFront', category: 'aws', icon: 'Globe', description: 'Content delivery network' },
   { id: 'sagemaker', name: 'SageMaker', category: 'aws', icon: 'Brain', description: 'Machine learning platform' },
+
+  // Google Cloud Platform
+  { id: 'gce', name: 'Compute Engine', category: 'gcp', icon: 'Server', description: 'Virtual machines on Google Cloud' },
+  { id: 'gke', name: 'Google Kubernetes Engine', category: 'gcp', icon: 'Box', description: 'Managed Kubernetes service' },
+  { id: 'bigquery', name: 'BigQuery', category: 'gcp', icon: 'Database', description: 'Serverless data warehouse' },
+  { id: 'cloud-functions', name: 'Cloud Functions', category: 'gcp', icon: 'Zap', description: 'Serverless compute service' },
+  { id: 'cloud-storage', name: 'Cloud Storage', category: 'gcp', icon: 'HardDrive', description: 'Object storage service' },
+  { id: 'firebase', name: 'Firebase', category: 'gcp', icon: 'Flame', description: 'App development platform' },
+  { id: 'vertex-ai', name: 'Vertex AI', category: 'gcp', icon: 'Brain', description: 'Machine learning platform' },
+  { id: 'cloud-run', name: 'Cloud Run', category: 'gcp', icon: 'Play', description: 'Serverless containers' },
+
+  // General Programming Languages
+  { id: 'python', name: 'Python', category: 'programming', icon: 'Code', description: 'General-purpose programming language' },
+  { id: 'java', name: 'Java', category: 'programming', icon: 'Coffee', description: 'Object-oriented programming language' },
+  { id: 'javascript', name: 'JavaScript', category: 'programming', icon: 'FileCode', description: 'Web development language' },
+  { id: 'go', name: 'Go', category: 'programming', icon: 'Code', description: 'Systems programming language' },
+  { id: 'rust', name: 'Rust', category: 'programming', icon: 'Shield', description: 'Memory-safe systems language' },
+  { id: 'react', name: 'React', category: 'programming', icon: 'Atom', description: 'JavaScript UI library' },
+  { id: 'nodejs', name: 'Node.js', category: 'programming', icon: 'Server', description: 'JavaScript runtime' },
+  { id: 'sql', name: 'SQL', category: 'programming', icon: 'Database', description: 'Database query language' },
+
+  // DevOps & Infrastructure
+  { id: 'kubernetes', name: 'Kubernetes', category: 'devops', icon: 'Box', description: 'Container orchestration platform' },
+  { id: 'docker', name: 'Docker', category: 'devops', icon: 'Container', description: 'Container platform' },
+  { id: 'terraform', name: 'Terraform', category: 'devops', icon: 'Layers', description: 'Infrastructure as Code' },
+  { id: 'jenkins', name: 'Jenkins', category: 'devops', icon: 'GitBranch', description: 'CI/CD automation server' },
+  { id: 'github-actions', name: 'GitHub Actions', category: 'devops', icon: 'GitBranch', description: 'CI/CD workflows' },
+  { id: 'ansible', name: 'Ansible', category: 'devops', icon: 'Settings', description: 'Configuration management' },
+  { id: 'prometheus', name: 'Prometheus', category: 'devops', icon: 'Activity', description: 'Monitoring and alerting' },
+  { id: 'linux', name: 'Linux', category: 'devops', icon: 'Terminal', description: 'Operating system' },
+
+  // Data & AI
+  { id: 'tensorflow', name: 'TensorFlow', category: 'data-ai', icon: 'Brain', description: 'Machine learning framework' },
+  { id: 'pytorch', name: 'PyTorch', category: 'data-ai', icon: 'Brain', description: 'Deep learning framework' },
+  { id: 'spark', name: 'Apache Spark', category: 'data-ai', icon: 'Zap', description: 'Big data processing' },
+  { id: 'pandas', name: 'Pandas', category: 'data-ai', icon: 'Table', description: 'Data analysis library' },
+  { id: 'llm', name: 'LLMs & GPT', category: 'data-ai', icon: 'MessageSquare', description: 'Large language models' },
+  { id: 'mlops', name: 'MLOps', category: 'data-ai', icon: 'GitBranch', description: 'ML operations and pipelines' },
+  { id: 'data-engineering', name: 'Data Engineering', category: 'data-ai', icon: 'Database', description: 'Data pipelines and ETL' },
+  { id: 'power-bi', name: 'Power BI', category: 'data-ai', icon: 'BarChart', description: 'Business intelligence tool' },
 ];
 
 export const roles: { id: Role; name: string; description: string; icon: string }[] = [
@@ -27,6 +67,7 @@ export const roles: { id: Role; name: string; description: string; icon: string 
   { id: 'devops-engineer', name: 'DevOps/Cloud Engineer', description: 'Infrastructure, CI/CD, and cloud architecture', icon: 'Server' },
   { id: 'project-manager', name: 'Project Manager', description: 'Scrum Master, Agile Coach, PM roles', icon: 'Users' },
   { id: 'data-scientist', name: 'Data Scientist', description: 'ML Engineer, Data Analyst roles', icon: 'BarChart' },
+  { id: 'qa-analyst', name: 'QA/Analyst', description: 'Manual Testing, Automation, Quality Assurance', icon: 'ClipboardCheck' },
 ];
 
 export const experienceLevels: { id: string; name: string; years: string; description: string }[] = [
