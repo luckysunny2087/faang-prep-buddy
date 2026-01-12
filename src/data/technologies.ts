@@ -1,4 +1,15 @@
-import { Technology, Role, Company, QuestionType } from '@/types/interview';
+import { Technology, Role, Company, QuestionType, Domain } from '@/types/interview';
+
+export const domains: { id: Domain; name: string; description: string; icon: string }[] = [
+  { id: 'finance-fintech', name: 'Finance / Fintech', description: 'Banking, payments, trading, insurance', icon: 'Landmark' },
+  { id: 'technology-it', name: 'Technology / IT', description: 'Software, SaaS, tech consulting', icon: 'Monitor' },
+  { id: 'pharma-healthcare', name: 'Pharma / Healthcare', description: 'Pharmaceuticals, medical devices, health systems', icon: 'Heart' },
+  { id: 'retail-ecommerce', name: 'Retail & E-Commerce', description: 'Online shopping, retail operations', icon: 'ShoppingCart' },
+  { id: 'supply-chain-logistics', name: 'Supply Chain & Logistics', description: 'Shipping, warehousing, distribution', icon: 'Truck' },
+  { id: 'automotive', name: 'Automotive', description: 'Vehicle manufacturing, mobility solutions', icon: 'Car' },
+  { id: 'telecommunications', name: 'Telecommunications', description: 'Networks, mobile, communications', icon: 'Radio' },
+  { id: 'government-public-sector', name: 'Government / Public Sector', description: 'Government agencies, public services', icon: 'Building2' },
+];
 
 export const technologies: Technology[] = [
   // Microsoft Technologies
@@ -68,6 +79,7 @@ export const roles: { id: Role; name: string; description: string; icon: string 
   { id: 'project-manager', name: 'Project Manager', description: 'Scrum Master, Agile Coach, PM roles', icon: 'Users' },
   { id: 'data-scientist', name: 'Data Scientist', description: 'ML Engineer, Data Analyst roles', icon: 'BarChart' },
   { id: 'qa-analyst', name: 'QA/Analyst', description: 'Manual Testing, Automation, Quality Assurance', icon: 'ClipboardCheck' },
+  { id: 'business-analyst', name: 'Business Analyst', description: 'Requirements gathering, process analysis, stakeholder management', icon: 'Briefcase' },
 ];
 
 export const experienceLevels: { id: string; name: string; years: string; description: string }[] = [

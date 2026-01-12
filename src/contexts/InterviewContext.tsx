@@ -5,6 +5,7 @@ import {
   ExperienceLevel, 
   QuestionType, 
   Company,
+  Domain,
   InterviewSession,
   InterviewQuestion,
   InterviewAnswer 
@@ -16,6 +17,7 @@ interface InterviewContextType {
   selectedRole: Role | null;
   selectedLevel: ExperienceLevel | null;
   selectedCompany: Company | null;
+  selectedDomain: Domain | null;
   selectedQuestionTypes: QuestionType[];
   
   // Session state
@@ -28,6 +30,7 @@ interface InterviewContextType {
   setSelectedRole: (role: Role | null) => void;
   setSelectedLevel: (level: ExperienceLevel | null) => void;
   setSelectedCompany: (company: Company | null) => void;
+  setSelectedDomain: (domain: Domain | null) => void;
   setSelectedQuestionTypes: (types: QuestionType[]) => void;
   startSession: () => void;
   setCurrentSession: (session: InterviewSession | null) => void;
@@ -48,6 +51,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<ExperienceLevel | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
   const [selectedQuestionTypes, setSelectedQuestionTypes] = useState<QuestionType[]>([]);
   
   // Session state
@@ -121,6 +125,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
     setSelectedRole(null);
     setSelectedLevel(null);
     setSelectedCompany(null);
+    setSelectedDomain(null);
     setSelectedQuestionTypes([]);
     setCurrentSession(null);
     setCurrentQuestionIndex(0);
@@ -133,6 +138,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         selectedRole,
         selectedLevel,
         selectedCompany,
+        selectedDomain,
         selectedQuestionTypes,
         currentSession,
         currentQuestionIndex,
@@ -141,6 +147,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         setSelectedRole,
         setSelectedLevel,
         setSelectedCompany,
+        setSelectedDomain,
         setSelectedQuestionTypes,
         startSession,
         setCurrentSession,
