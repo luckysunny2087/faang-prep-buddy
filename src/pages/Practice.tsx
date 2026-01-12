@@ -3,6 +3,7 @@ import { Layout } from '@/components/layout/Layout';
 import { TechnologySelector } from '@/components/practice/TechnologySelector';
 import { RoleSelector } from '@/components/practice/RoleSelector';
 import { LevelSelector } from '@/components/practice/LevelSelector';
+import { DomainSelector } from '@/components/practice/DomainSelector';
 import { CompanySelector } from '@/components/practice/CompanySelector';
 import { QuestionTypeSelector } from '@/components/practice/QuestionTypeSelector';
 import { Button } from '@/components/ui/button';
@@ -18,11 +19,13 @@ export default function Practice() {
     selectedRole,
     selectedLevel,
     selectedCompany,
+    selectedDomain,
     selectedQuestionTypes,
     setSelectedTechnology,
     setSelectedRole,
     setSelectedLevel,
     setSelectedCompany,
+    setSelectedDomain,
     setSelectedQuestionTypes,
     startSession,
   } = useInterview();
@@ -62,6 +65,10 @@ export default function Practice() {
           <LevelSelector 
             selectedLevel={selectedLevel} 
             onSelect={setSelectedLevel} 
+          />
+          <DomainSelector 
+            selectedDomain={selectedDomain} 
+            onSelect={setSelectedDomain} 
           />
           <CompanySelector 
             selectedCompany={selectedCompany} 

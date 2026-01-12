@@ -5,7 +5,18 @@ export type Role =
   | 'devops-engineer'
   | 'project-manager'
   | 'data-scientist'
-  | 'qa-analyst';
+  | 'qa-analyst'
+  | 'business-analyst';
+
+export type Domain = 
+  | 'finance-fintech'
+  | 'technology-it'
+  | 'pharma-healthcare'
+  | 'retail-ecommerce'
+  | 'supply-chain-logistics'
+  | 'automotive'
+  | 'telecommunications'
+  | 'government-public-sector';
 
 export type ExperienceLevel = 'junior' | 'mid' | 'senior';
 
