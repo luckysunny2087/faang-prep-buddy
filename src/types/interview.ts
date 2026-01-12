@@ -1,10 +1,11 @@
-export type TechnologyCategory = 'microsoft' | 'aws';
+export type TechnologyCategory = 'microsoft' | 'aws' | 'gcp' | 'programming' | 'devops' | 'data-ai';
 
 export type Role = 
   | 'software-engineer'
   | 'devops-engineer'
   | 'project-manager'
-  | 'data-scientist';
+  | 'data-scientist'
+  | 'qa-analyst';
 
 export type ExperienceLevel = 'junior' | 'mid' | 'senior';
 
