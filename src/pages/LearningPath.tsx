@@ -25,6 +25,9 @@ interface LearningPathData {
 const LearningPath = () => {
     const [expertiseLevel, setExpertiseLevel] = useState("");
     const [learningFocus, setLearningFocus] = useState("");
+    const [targetRole, setTargetRole] = useState("");
+    const [targetCompany, setTargetCompany] = useState("");
+    const [timeline, setTimeline] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [pathData, setPathData] = useState<LearningPathData | null>(null);
 
@@ -41,12 +44,21 @@ const LearningPath = () => {
                     action: 'generate-learning-path',
                     context: {
                         expertiseLevel,
-                        learningFocus
+                        learningFocus,
+                        targetRole,
+                        targetCompany,
+                        timeline
                     }
                 }
             });
 
             if (error) throw error;
+
+            if (data.error) {
+                toast.error(data.error);
+                return;
+            }
+
             setPathData(data);
             toast.success("Personalized path generated!");
         } catch (error) {
@@ -116,6 +128,44 @@ const LearningPath = () => {
                                             className="h-11"
                                         />
                                     </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="role" className="text-sm font-medium">Target Role (Optional)</Label>
+                                            <Input
+                                                id="role"
+                                                placeholder="e.g., Frontend Engineer"
+                                                value={targetRole}
+                                                onChange={(e) => setTargetRole(e.target.value)}
+                                                className="h-11"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="company" className="text-sm font-medium">Target Company (Optional)</Label>
+                                            <Input
+                                                id="company"
+                                                placeholder="e.g., Google"
+                                                value={targetCompany}
+                                                onChange={(e) => setTargetCompany(e.target.value)}
+                                                className="h-11"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="timeline" className="text-sm font-medium">Preparation Timeline</Label>
+                                        <Select onValueChange={setTimeline} value={timeline}>
+                                            <SelectTrigger id="timeline">
+                                                <SelectValue placeholder="How much time do you have?" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="2 weeks (Crash Course)">2 weeks (Crash Course)</SelectItem>
+                                                <SelectItem value="1 Month (Standard Prep)">1 Month (Standard Prep)</SelectItem>
+                                                <SelectItem value="3 Months (Deep Dive)">3 Months (Deep Dive)</SelectItem>
+                                                <SelectItem value="Self-Paced">Self-Paced</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </CardContent>
                                 <CardFooter>
                                     <Button
@@ -151,7 +201,7 @@ const LearningPath = () => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {pathData.stages.map((stage, index) => (
+                                {pathData && pathData.stages && Array.isArray(pathData.stages) && pathData.stages.map((stage, index) => (
                                     <motion.div
                                         key={index}
                                         initial={{ opacity: 0, y: 20 }}

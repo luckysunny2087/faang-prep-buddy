@@ -23,8 +23,9 @@ import Companies from "./pages/Companies";
 import Resources from "./pages/Resources";
 import Pricing from "./pages/Pricing";
 import Checkout from "./pages/Checkout";
-import LearningPath from "./pages/LearningPath";
 import NotFound from "./pages/NotFound";
+
+import LearningPath from "./pages/LearningPath";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/practice" element={<ProtectedRoute><Practice /></ProtectedRoute>} />
+              <Route path="/learning-path" element={<ProtectedRoute><LearningPath /></ProtectedRoute>} />
               <Route path="/interview" element={<ProtectedRoute><Interview /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/results" element={<ProtectedRoute><Results /></ProtectedRoute>} />
@@ -47,7 +49,6 @@ const App = () => (
               <Route path="/resources" element={<Resources />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-              <Route path="/learning-path" element={<ProtectedRoute><LearningPath /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -40,10 +40,10 @@ export function Header() {
 
   const navLinks = [
     { href: '/practice', label: 'Practice' },
+    { href: '/learning-path', label: 'Roadmap' },
     { href: '/companies', label: 'Companies' },
     { href: '/resources', label: 'Resources' },
     { href: '/pricing', label: 'Pricing' },
-    { href: '/learning-path', label: 'Path' },
   ];
 
   return (
