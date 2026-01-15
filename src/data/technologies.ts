@@ -82,10 +82,12 @@ export const roles: { id: Role; name: string; description: string; icon: string 
   { id: 'business-analyst', name: 'Business Analyst', description: 'Requirements gathering, process analysis, stakeholder management', icon: 'Briefcase' },
 ];
 
-export const experienceLevels: { id: string; name: string; years: string; description: string }[] = [
-  { id: 'junior', name: 'Junior (L3-L4)', years: '0-2 years', description: 'Entry level positions' },
-  { id: 'mid', name: 'Mid-Level (L4-L5)', years: '3-5 years', description: 'Intermediate positions' },
-  { id: 'senior', name: 'Senior (L5+)', years: '5+ years', description: 'Senior and lead positions' },
+export const experienceLevels: { id: string; name: string; years: string; description: string; level: string }[] = [
+  { id: 'l1', name: 'L1', years: '0-2 years', description: 'Entry level, learning fundamentals', level: '1' },
+  { id: 'l2', name: 'L2', years: '2-5 years', description: 'Growing expertise, independent contributor', level: '2' },
+  { id: 'l3', name: 'L3', years: '5-7 years', description: 'Solid experience, mentoring others', level: '3' },
+  { id: 'l4', name: 'L4', years: '7-10 years', description: 'Technical leadership, architecture decisions', level: '4' },
+  { id: 'l5', name: 'L5', years: '10+ years', description: 'Principal/Staff level, strategic impact', level: '5' },
 ];
 
 export const companies: { id: Company; name: string; color: string; description: string }[] = [

@@ -18,7 +18,7 @@ export type Domain =
   | 'telecommunications'
   | 'government-public-sector';
 
-export type ExperienceLevel = 'junior' | 'mid' | 'senior';
+export type ExperienceLevel = 'l1' | 'l2' | 'l3' | 'l4' | 'l5';
 
 export type QuestionType = 
   | 'technical'
