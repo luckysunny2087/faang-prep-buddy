@@ -21,6 +21,9 @@ import Results from "./pages/Results";
 import Auth from "./pages/Auth";
 import Companies from "./pages/Companies";
 import Resources from "./pages/Resources";
+import Pricing from "./pages/Pricing";
+import Checkout from "./pages/Checkout";
+import LearningPath from "./pages/LearningPath";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +45,9 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/companies" element={<Companies />} />
               <Route path="/resources" element={<Resources />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+              <Route path="/learning-path" element={<ProtectedRoute><LearningPath /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -16,10 +16,10 @@ async function callAIWithRetry(systemPrompt: string, userPrompt: string, maxRetr
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
   let lastError: Error | null = null;
-  
+
   for (let modelIndex = 0; modelIndex < MODELS.length; modelIndex++) {
     const model = MODELS[modelIndex];
-    
+
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -56,7 +56,7 @@ async function callAIWithRetry(systemPrompt: string, userPrompt: string, maxRetr
         console.error(`Error with ${model}:`, lastError.message);
       }
     }
-    
+
     console.log(`Switching from ${model} to next model...`);
   }
 
@@ -80,6 +80,9 @@ serve(async (req) => {
     } else if (action === 'evaluate-answer') {
       systemPrompt = `You are an expert FAANG interviewer evaluating a ${context.level} ${context.role} candidate's answer.${context.domain ? ` Consider the ${context.domain} industry context.` : ''}`;
       userPrompt = `Question: ${context.question}\n\nCandidate's Answer: ${context.answer}\n\nEvaluate this answer. Return JSON only: {"score": 1-10, "feedback": "detailed feedback", "strengths": ["strength1", "strength2"], "improvements": ["area1", "area2"]}`;
+    } else if (action === 'generate-learning-path') {
+      systemPrompt = `You are an expert FAANG interview mentor. Create a personalized learning path for a candidate at the ${context.expertiseLevel} level focusing on ${context.learningFocus}.`;
+      userPrompt = `Create a structured learning path with 4-5 stages. For each stage, provide a title, description, and key topics. Return JSON only: {"title": "Path Title", "description": "Overall Description", "stages": [{"title": "Stage 1", "description": "Stage 1 description", "topics": ["topic1", "topic2"]}]}`;
     }
 
     const response = await callAIWithRetry(systemPrompt, userPrompt);
@@ -94,7 +97,7 @@ serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     const isRateLimit = errorMessage.includes("rate") || errorMessage.includes("429");
     return new Response(
-      JSON.stringify({ error: isRateLimit ? "Service is busy, please try again in a moment" : errorMessage }), 
+      JSON.stringify({ error: isRateLimit ? "Service is busy, please try again in a moment" : errorMessage }),
       { status: isRateLimit ? 503 : 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
