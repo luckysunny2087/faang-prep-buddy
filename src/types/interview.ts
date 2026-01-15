@@ -64,7 +64,7 @@ export interface InterviewAnswer {
 export interface InterviewSession {
   id: string;
   userId?: string;
-  technology: TechnologyCategory;
+  technologies: TechnologyCategory[];
   role: Role;
   level: ExperienceLevel;
   company?: Company;

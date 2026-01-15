@@ -15,13 +15,13 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 export default function Practice() {
   const navigate = useNavigate();
   const {
-    selectedTechnology,
+    selectedTechnologies,
     selectedRole,
     selectedLevel,
     selectedCompany,
     selectedDomain,
     selectedQuestionTypes,
-    setSelectedTechnology,
+    toggleTechnology,
     setSelectedRole,
     setSelectedLevel,
     setSelectedCompany,
@@ -38,7 +38,7 @@ export default function Practice() {
     }
   };
 
-  const canStartSession = selectedTechnology && selectedRole && selectedLevel;
+  const canStartSession = selectedRole && selectedLevel;
 
   const handleStartSession = () => {
     startSession();
@@ -55,8 +55,8 @@ export default function Practice() {
 
         <div className="space-y-6">
           <TechnologySelector 
-            selectedTechnology={selectedTechnology} 
-            onSelect={setSelectedTechnology} 
+            selectedTechnologies={selectedTechnologies} 
+            onToggle={toggleTechnology} 
           />
           <RoleSelector 
             selectedRole={selectedRole} 

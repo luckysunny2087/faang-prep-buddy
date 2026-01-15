@@ -13,7 +13,7 @@ import {
 
 interface InterviewContextType {
   // Setup state
-  selectedTechnology: TechnologyCategory | null;
+  selectedTechnologies: TechnologyCategory[];
   selectedRole: Role | null;
   selectedLevel: ExperienceLevel | null;
   selectedCompany: Company | null;
@@ -26,7 +26,8 @@ interface InterviewContextType {
   isLoading: boolean;
   
   // Actions
-  setSelectedTechnology: (tech: TechnologyCategory | null) => void;
+  setSelectedTechnologies: (techs: TechnologyCategory[]) => void;
+  toggleTechnology: (tech: TechnologyCategory) => void;
   setSelectedRole: (role: Role | null) => void;
   setSelectedLevel: (level: ExperienceLevel | null) => void;
   setSelectedCompany: (company: Company | null) => void;
@@ -47,12 +48,20 @@ const InterviewContext = createContext<InterviewContextType | undefined>(undefin
 
 export function InterviewProvider({ children }: { children: ReactNode }) {
   // Setup state
-  const [selectedTechnology, setSelectedTechnology] = useState<TechnologyCategory | null>(null);
+  const [selectedTechnologies, setSelectedTechnologies] = useState<TechnologyCategory[]>([]);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<ExperienceLevel | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
   const [selectedQuestionTypes, setSelectedQuestionTypes] = useState<QuestionType[]>([]);
+
+  const toggleTechnology = useCallback((tech: TechnologyCategory) => {
+    setSelectedTechnologies(prev => 
+      prev.includes(tech) 
+        ? prev.filter(t => t !== tech)
+        : [...prev, tech]
+    );
+  }, []);
   
   // Session state
   const [currentSession, setCurrentSession] = useState<InterviewSession | null>(null);
@@ -60,11 +69,11 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const startSession = useCallback(() => {
-    if (!selectedTechnology || !selectedRole || !selectedLevel) return;
+    if (!selectedRole || !selectedLevel) return;
     
     const session: InterviewSession = {
       id: crypto.randomUUID(),
-      technology: selectedTechnology,
+      technologies: selectedTechnologies,
       role: selectedRole,
       level: selectedLevel,
       company: selectedCompany || undefined,
@@ -76,7 +85,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
     
     setCurrentSession(session);
     setCurrentQuestionIndex(0);
-  }, [selectedTechnology, selectedRole, selectedLevel, selectedCompany, selectedQuestionTypes]);
+  }, [selectedTechnologies, selectedRole, selectedLevel, selectedCompany, selectedQuestionTypes]);
 
   const addQuestion = useCallback((question: InterviewQuestion) => {
     setCurrentSession(prev => {
@@ -121,7 +130,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const resetSetup = useCallback(() => {
-    setSelectedTechnology(null);
+    setSelectedTechnologies([]);
     setSelectedRole(null);
     setSelectedLevel(null);
     setSelectedCompany(null);
@@ -134,7 +143,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
   return (
     <InterviewContext.Provider
       value={{
-        selectedTechnology,
+        selectedTechnologies,
         selectedRole,
         selectedLevel,
         selectedCompany,
@@ -143,7 +152,8 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         currentSession,
         currentQuestionIndex,
         isLoading,
-        setSelectedTechnology,
+        setSelectedTechnologies,
+        toggleTechnology,
         setSelectedRole,
         setSelectedLevel,
         setSelectedCompany,
