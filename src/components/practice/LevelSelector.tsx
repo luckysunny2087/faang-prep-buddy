@@ -25,8 +25,8 @@ export function LevelSelector({ selectedLevel, onSelect }: LevelSelectorProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {experienceLevels.map((level, index) => {
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {experienceLevels.map((level) => {
               const isSelected = selectedLevel === level.id;
               
               return (
@@ -34,21 +34,20 @@ export function LevelSelector({ selectedLevel, onSelect }: LevelSelectorProps) {
                   key={level.id}
                   onClick={() => onSelect(level.id as ExperienceLevel)}
                   className={cn(
-                    "flex flex-col items-center p-6 rounded-lg border-2 text-center transition-all",
+                    "flex flex-col items-center p-4 rounded-lg border-2 text-center transition-all",
                     isSelected 
                       ? "border-primary bg-primary/5" 
                       : "border-border hover:border-primary/50 hover:bg-muted/50"
                   )}
                 >
                   <div className={cn(
-                    "h-12 w-12 rounded-full flex items-center justify-center mb-3 text-lg font-bold",
+                    "h-10 w-10 rounded-full flex items-center justify-center mb-2 text-sm font-bold",
                     isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
                   )}>
-                    L{index + 3}
+                    {level.name}
                   </div>
-                  <h4 className="font-semibold">{level.name}</h4>
-                  <p className="text-sm text-muted-foreground">{level.years}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{level.description}</p>
+                  <p className="text-xs font-medium text-muted-foreground">{level.years}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2">{level.description}</p>
                 </button>
               );
             })}
