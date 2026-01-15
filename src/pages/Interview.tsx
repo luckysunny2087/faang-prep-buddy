@@ -8,8 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowRight, Loader2, CheckCircle, XCircle, Lightbulb } from 'lucide-react';
+import { ArrowRight, Loader2, CheckCircle, XCircle, Lightbulb, RefreshCw, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function Interview() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function Interview() {
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState<{ score: number; feedback: string; strengths: string[]; improvements: string[] } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<{ type: 'rate-limit' | 'general'; message: string; action: 'generate' | 'evaluate' } | null>(null);
   const startTimeRef = useRef<Date>(new Date());
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export default function Interview() {
   const generateQuestion = async () => {
     if (!currentSession) return;
     setIsGenerating(true);
+    setError(null);
     try {
       const { data, error } = await supabase.functions.invoke('interview-ai', {
         body: {
@@ -48,9 +51,24 @@ export default function Interview() {
         }
       });
       if (error) throw error;
+      if (data.error) {
+        const isRateLimit = data.error.toLowerCase().includes('rate') || data.error.toLowerCase().includes('busy');
+        setError({
+          type: isRateLimit ? 'rate-limit' : 'general',
+          message: data.error,
+          action: 'generate'
+        });
+        return;
+      }
       addQuestion({ id: crypto.randomUUID(), question: data.question, type: data.type, difficulty: currentSession.level });
-    } catch (err) {
-      toast.error('Failed to generate question');
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Failed to generate question';
+      const isRateLimit = errorMsg.toLowerCase().includes('rate') || err?.status === 429;
+      setError({
+        type: isRateLimit ? 'rate-limit' : 'general',
+        message: isRateLimit ? 'Service is busy. Please wait a moment and try again.' : errorMsg,
+        action: 'generate'
+      });
     } finally {
       setIsGenerating(false);
     }
@@ -62,6 +80,7 @@ export default function Interview() {
     if (!currentQuestion) return;
     
     setIsLoading(true);
+    setError(null);
     try {
       const { data, error } = await supabase.functions.invoke('interview-ai', {
         body: {
@@ -76,12 +95,35 @@ export default function Interview() {
         }
       });
       if (error) throw error;
+      if (data.error) {
+        const isRateLimit = data.error.toLowerCase().includes('rate') || data.error.toLowerCase().includes('busy');
+        setError({
+          type: isRateLimit ? 'rate-limit' : 'general',
+          message: data.error,
+          action: 'evaluate'
+        });
+        return;
+      }
       setFeedback(data);
       addAnswer({ questionId: currentQuestion.id, answer: userAnswer, ...data });
-    } catch (err) {
-      toast.error('Failed to evaluate answer');
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Failed to evaluate answer';
+      const isRateLimit = errorMsg.toLowerCase().includes('rate') || err?.status === 429;
+      setError({
+        type: isRateLimit ? 'rate-limit' : 'general',
+        message: isRateLimit ? 'Service is busy. Please wait a moment and try again.' : errorMsg,
+        action: 'evaluate'
+      });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRetry = () => {
+    if (error?.action === 'generate') {
+      generateQuestion();
+    } else if (error?.action === 'evaluate') {
+      submitAnswer();
     }
   };
 
@@ -144,6 +186,7 @@ export default function Interview() {
   const handleNext = async () => {
     setUserAnswer('');
     setFeedback(null);
+    setError(null);
     if (currentQuestionIndex < 9) {
       nextQuestion();
       generateQuestion();
@@ -158,6 +201,51 @@ export default function Interview() {
   const currentQuestion = currentSession.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / 10) * 100;
 
+  const LoadingCard = ({ message }: { message: string }) => (
+    <Card>
+      <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
+        <div className="relative">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <div className="absolute inset-0 h-12 w-12 animate-ping opacity-20 rounded-full bg-primary" />
+        </div>
+        <div className="text-center space-y-2">
+          <p className="text-lg font-medium">{message}</p>
+          <p className="text-sm text-muted-foreground">This may take a few seconds...</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const ErrorCard = () => (
+    <Card className="border-destructive/50">
+      <CardContent className="py-8">
+        <Alert variant={error?.type === 'rate-limit' ? 'default' : 'destructive'} className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>
+            {error?.type === 'rate-limit' ? 'Service Temporarily Busy' : 'Something went wrong'}
+          </AlertTitle>
+          <AlertDescription>
+            {error?.message || 'An unexpected error occurred. Please try again.'}
+          </AlertDescription>
+        </Alert>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button onClick={handleRetry} className="flex-1">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Try Again
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/practice')} className="flex-1">
+            Back to Setup
+          </Button>
+        </div>
+        {error?.type === 'rate-limit' && (
+          <p className="text-xs text-muted-foreground text-center mt-4">
+            Tip: Wait 5-10 seconds before retrying for best results
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+
   return (
     <Layout showFooter={false}>
       <div className="container py-8 max-w-3xl">
@@ -169,8 +257,10 @@ export default function Interview() {
           <Progress value={progress} className="h-2" />
         </div>
 
-        {isGenerating ? (
-          <Card><CardContent className="flex items-center justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></CardContent></Card>
+        {error ? (
+          <ErrorCard />
+        ) : isGenerating ? (
+          <LoadingCard message="Generating your question..." />
         ) : currentQuestion ? (
           <div className="space-y-6">
             <Card>
@@ -186,12 +276,18 @@ export default function Interview() {
                   value={userAnswer}
                   onChange={(e) => setUserAnswer(e.target.value)}
                   className="min-h-[200px]"
-                  disabled={!!feedback}
+                  disabled={!!feedback || isLoading}
                 />
                 {!feedback && (
                   <Button onClick={submitAnswer} disabled={isLoading || !userAnswer.trim()} className="mt-4">
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Submit Answer
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Evaluating your answer...
+                      </>
+                    ) : (
+                      'Submit Answer'
+                    )}
                   </Button>
                 )}
               </CardContent>
