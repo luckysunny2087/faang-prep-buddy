@@ -41,7 +41,7 @@ export default function Interview() {
         body: {
           action: 'generate-question',
           context: {
-            technology: currentSession.technology,
+            technologies: currentSession.technologies,
             role: currentSession.role,
             level: currentSession.level,
             company: currentSession.company,
@@ -144,7 +144,7 @@ export default function Interview() {
       // Save interview session
       await supabase.from('interview_sessions').insert({
         user_id: user.id,
-        technology: currentSession.technology,
+        technology: currentSession.technologies.join(',') || 'general',
         role: currentSession.role,
         level: currentSession.level,
         company: currentSession.company || null,
@@ -252,7 +252,11 @@ export default function Interview() {
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-muted-foreground">Question {currentQuestionIndex + 1} of 10</span>
-            <Badge variant="secondary">{currentSession.technology.toUpperCase()}</Badge>
+            <Badge variant="secondary">
+              {currentSession.technologies.length > 0 
+                ? currentSession.technologies.map(t => t.toUpperCase()).join(', ') 
+                : 'General'}
+            </Badge>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
