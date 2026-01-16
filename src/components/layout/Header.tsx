@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Moon, Sun, User, LogOut, BarChart3, Settings, Menu } from 'lucide-react';
@@ -40,8 +40,10 @@ export function Header() {
 
   const navLinks = [
     { href: '/practice', label: 'Practice' },
+    { href: '/learning-path', label: 'Roadmap' },
     { href: '/companies', label: 'Companies' },
     { href: '/resources', label: 'Resources' },
+    { href: '/pricing', label: 'Pricing' },
   ];
 
   return (
@@ -56,10 +58,10 @@ export function Header() {
               InterviewPrep
             </span>
           </Link>
-          
+
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map(link => (
-              <Link 
+              <Link
                 key={link.href}
                 to={link.href}
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -136,7 +138,7 @@ export function Header() {
             <SheetContent side="right" className="w-[300px]">
               <nav className="flex flex-col gap-4 mt-8">
                 {navLinks.map(link => (
-                  <Link 
+                  <Link
                     key={link.href}
                     to={link.href}
                     onClick={() => setIsOpen(false)}

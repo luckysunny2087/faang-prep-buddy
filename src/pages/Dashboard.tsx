@@ -5,15 +5,15 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useDashboardData } from "@/hooks/useDashboardData";
-import { 
-  Target, 
-  TrendingUp, 
-  Calendar, 
-  Award, 
-  Flame, 
-  Brain, 
-  Code, 
-  Users, 
+import {
+  Target,
+  TrendingUp,
+  Calendar,
+  Award,
+  Flame,
+  Brain,
+  Code,
+  Users,
   Lightbulb,
   ChevronRight,
   Trophy,
@@ -53,9 +53,9 @@ const achievements = [
 export default function Dashboard() {
   const navigate = useNavigate();
   const { loading, stats, recentSessions, skillsData, performanceData, companyReadiness } = useDashboardData();
-  
+
   const displaySkills = skillsData.length > 0 ? skillsData : defaultSkillsData;
-  
+
   // Calculate achievement status
   const getAchievementStatus = (id: number) => {
     switch (id) {
@@ -169,17 +169,17 @@ export default function Dashboard() {
                         <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                         <XAxis dataKey="date" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                         <YAxis domain={[0, 100]} className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'hsl(var(--card))', 
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
                             border: '1px solid hsl(var(--border))',
                             borderRadius: '8px'
                           }}
                         />
-                        <Line 
-                          type="monotone" 
-                          dataKey="score" 
-                          stroke="hsl(var(--primary))" 
+                        <Line
+                          type="monotone"
+                          dataKey="score"
+                          stroke="hsl(var(--primary))"
                           strokeWidth={3}
                           dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2 }}
                         />
@@ -245,9 +245,9 @@ export default function Dashboard() {
                         <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                         <XAxis type="number" domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                         <YAxis dataKey="company" type="category" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} width={70} />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'hsl(var(--card))', 
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
                             border: '1px solid hsl(var(--border))',
                             borderRadius: '8px'
                           }}
@@ -326,16 +326,14 @@ export default function Dashboard() {
                     return (
                       <div
                         key={achievement.id}
-                        className={`p-4 rounded-lg text-center transition-all ${
-                          unlocked 
-                            ? "bg-primary/10 border border-primary/30" 
+                        className={`p-4 rounded-lg text-center transition-all ${unlocked
+                            ? "bg-primary/10 border border-primary/30"
                             : "bg-muted/50 opacity-50"
-                        }`}
+                          }`}
                       >
-                        <achievement.icon 
-                          className={`w-8 h-8 mx-auto mb-2 ${
-                            unlocked ? "text-primary" : "text-muted-foreground"
-                          }`} 
+                        <achievement.icon
+                          className={`w-8 h-8 mx-auto mb-2 ${unlocked ? "text-primary" : "text-muted-foreground"
+                            }`}
                         />
                         <p className="font-medium text-sm text-foreground">{achievement.name}</p>
                         <p className="text-xs text-muted-foreground mt-1">{achievement.description}</p>
@@ -347,17 +345,47 @@ export default function Dashboard() {
             </Card>
           </motion.div>
 
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="mt-8 text-center"
-          >
-            <Button size="lg" onClick={() => navigate("/practice")} className="font-semibold">
-              Start New Practice Session
-            </Button>
-          </motion.div>
+          {/* CTA Row */}
+          <div className="grid md:grid-cols-2 gap-6 mt-8">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <Card className="bg-gradient-to-br from-primary/10 to-blue-500/10 border-primary/20 overflow-hidden relative">
+                <div className="absolute top-0 right-0 p-8 opacity-10">
+                  <Lightbulb className="w-24 h-24 text-primary" />
+                </div>
+                <CardHeader>
+                  <CardTitle className="text-xl font-display">Custom Roadmap</CardTitle>
+                  <CardDescription>Generate a tailored learning path based on your goals</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={() => navigate("/learning-path")} className="w-full">
+                    Generate My Path <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <Card className="bg-card border-border overflow-hidden relative">
+                <CardHeader>
+                  <CardTitle className="text-xl font-display">New Practice</CardTitle>
+                  <CardDescription>Start a new AI-powered interview session</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" onClick={() => navigate("/practice")} className="w-full">
+                    Start Interviewing <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </div>
       </div>
     </Layout>
