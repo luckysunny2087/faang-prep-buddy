@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Brain, Sparkles, Loader2, ChevronRight, BookOpen, Target, GraduationCap } from "lucide-react";
+import { Brain, Sparkles, Loader2, ChevronRight, BookOpen, Target, GraduationCap, Download } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface PathStage {
     title: string;
@@ -67,6 +69,47 @@ const LearningPath = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const downloadPDF = () => {
+        if (!pathData) return;
+
+        const doc = new jsPDF();
+
+        // Add Title
+        doc.setFontSize(22);
+        doc.setTextColor(33, 33, 33);
+        doc.text(pathData.title, 14, 22);
+
+        // Add Description
+        doc.setFontSize(12);
+        doc.setTextColor(100, 100, 100);
+        const splitDescription = doc.splitTextToSize(pathData.description, 180);
+        doc.text(splitDescription, 14, 32);
+
+        // Add Stages
+        const tableData = pathData.stages.map((stage, index) => [
+            `Stage ${index + 1}: ${stage.title}`,
+            stage.description,
+            stage.topics.join(", ")
+        ]);
+
+        autoTable(doc, {
+            startY: 45 + (splitDescription.length * 5),
+            head: [['Stage', 'Description', 'Core Topics']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: { fillColor: [63, 81, 181] },
+            styles: { fontSize: 10, cellPadding: 5 },
+            columnStyles: {
+                0: { cellWidth: 40 },
+                1: { cellWidth: 80 },
+                2: { cellWidth: 50 },
+            }
+        });
+
+        doc.save(`${pathData.title.replace(/\s+/g, '_')}_Roadmap.pdf`);
+        toast.success("PDF roadmap downloaded!");
     };
 
     return (
@@ -259,7 +302,10 @@ const LearningPath = () => {
                                 </p>
                                 <div className="flex gap-4 justify-center">
                                     <Button size="lg" onClick={() => window.location.href = '/practice'}>Start AI Interview</Button>
-                                    <Button size="lg" variant="outline">Save Path as PDF</Button>
+                                    <Button size="lg" variant="outline" onClick={downloadPDF}>
+                                        <Download className="mr-2 h-5 w-5" />
+                                        Save Path as PDF
+                                    </Button>
                                 </div>
                             </div>
                         </div>
