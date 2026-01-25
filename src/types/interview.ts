@@ -26,13 +26,8 @@ export type QuestionType =
   | 'system-design'
   | 'domain-knowledge';
 
-export type Company = 
-  | 'amazon'
-  | 'google'
-  | 'meta'
-  | 'apple'
-  | 'netflix'
-  | 'microsoft';
+// Company is now a flexible string to support any company globally
+export type Company = string;
 
 export interface Technology {
   id: string;

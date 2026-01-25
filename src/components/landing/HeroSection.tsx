@@ -35,9 +35,9 @@ export function HeroSection() {
             className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6"
           >
             Ace Your{' '}
-            <span className="gradient-text">FAANG Interview</span>
+            <span className="gradient-text">Tech Interview</span>
             <br />
-            With Confidence
+            At Any Company
           </motion.h1>
 
           <motion.p
@@ -47,7 +47,7 @@ export function HeroSection() {
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8"
           >
             Practice with AI-generated questions tailored to your role, experience level, 
-            and target company. Get instant feedback and track your progress.
+            and target company — from FAANG to startups, consulting firms to banks, globally.
           </motion.p>
 
           <motion.div
@@ -85,7 +85,7 @@ export function HeroSection() {
               { icon: Target, value: '10K+', label: 'Questions' },
               { icon: Users, value: '50K+', label: 'Users' },
               { icon: TrendingUp, value: '85%', label: 'Success Rate' },
-              { icon: Sparkles, value: '6', label: 'FAANG Companies' },
+              { icon: Sparkles, value: '70+', label: 'Companies' },
             ].map((stat, index) => (
               <div key={index} className="text-center">
                 <stat.icon className="h-6 w-6 mx-auto mb-2 text-primary" />
