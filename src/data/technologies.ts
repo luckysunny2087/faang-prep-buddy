@@ -90,6 +90,95 @@ export const experienceLevels: { id: string; name: string; years: string; descri
   { id: 'l5', name: 'L5', years: '10+ years', description: 'Principal/Staff level, strategic impact', level: '5' },
 ];
 
+// Company categories for organized display
+export type CompanyCategory = 'big-tech' | 'consulting' | 'finance' | 'indian-it' | 'enterprise' | 'retail' | 'automotive';
+
+export interface CompanyInfo {
+  id: Company;
+  name: string;
+  category: CompanyCategory;
+  description: string;
+  interviewFocus?: string;
+}
+
+// Featured companies organized by category
+export const featuredCompanies: CompanyInfo[] = [
+  // Big Tech (FAANG+)
+  { id: 'amazon', name: 'Amazon', category: 'big-tech', description: 'E-commerce & cloud computing giant', interviewFocus: 'Leadership principles, behavioral questions' },
+  { id: 'google', name: 'Google', category: 'big-tech', description: 'Search & technology leader', interviewFocus: 'Algorithms, system design, Googleyness' },
+  { id: 'meta', name: 'Meta', category: 'big-tech', description: 'Social media & metaverse', interviewFocus: 'Product sense, scaling, coding' },
+  { id: 'apple', name: 'Apple', category: 'big-tech', description: 'Consumer electronics & software', interviewFocus: 'Design thinking, quality, attention to detail' },
+  { id: 'netflix', name: 'Netflix', category: 'big-tech', description: 'Streaming entertainment', interviewFocus: 'Culture fit, autonomy, impact' },
+  { id: 'microsoft', name: 'Microsoft', category: 'big-tech', description: 'Software & cloud services', interviewFocus: 'Growth mindset, collaboration, technical depth' },
+  { id: 'salesforce', name: 'Salesforce', category: 'big-tech', description: 'CRM & enterprise cloud', interviewFocus: 'Customer success, platform knowledge' },
+  { id: 'oracle', name: 'Oracle', category: 'big-tech', description: 'Database & enterprise software', interviewFocus: 'Technical expertise, problem-solving' },
+  { id: 'adobe', name: 'Adobe', category: 'big-tech', description: 'Creative & document software', interviewFocus: 'Creativity, user experience, technical skills' },
+  { id: 'intel', name: 'Intel', category: 'big-tech', description: 'Semiconductor manufacturing', interviewFocus: 'Hardware/software integration, deep technical' },
+  { id: 'cisco', name: 'Cisco', category: 'big-tech', description: 'Networking & communications', interviewFocus: 'Networking fundamentals, collaboration' },
+  { id: 'ibm', name: 'IBM', category: 'big-tech', description: 'Enterprise technology & consulting', interviewFocus: 'Innovation, enterprise solutions' },
+  
+  // Consulting
+  { id: 'accenture', name: 'Accenture', category: 'consulting', description: 'Global consulting & services', interviewFocus: 'Case studies, client management' },
+  { id: 'deloitte', name: 'Deloitte', category: 'consulting', description: 'Professional services firm', interviewFocus: 'Case studies, behavioral, domain expertise' },
+  { id: 'mckinsey', name: 'McKinsey', category: 'consulting', description: 'Management consulting', interviewFocus: 'Case interviews, problem structuring' },
+  { id: 'bcg', name: 'BCG', category: 'consulting', description: 'Boston Consulting Group', interviewFocus: 'Case studies, analytical thinking' },
+  { id: 'bain', name: 'Bain & Company', category: 'consulting', description: 'Strategy consulting', interviewFocus: 'Case interviews, experience interviews' },
+  { id: 'pwc', name: 'PwC', category: 'consulting', description: 'Audit & assurance services', interviewFocus: 'Technical skills, case studies' },
+  { id: 'ey', name: 'EY', category: 'consulting', description: 'Ernst & Young', interviewFocus: 'Behavioral, technical competency' },
+  { id: 'kpmg', name: 'KPMG', category: 'consulting', description: 'Audit & tax services', interviewFocus: 'Case studies, industry knowledge' },
+  { id: 'capgemini', name: 'Capgemini', category: 'consulting', description: 'Technology consulting', interviewFocus: 'Technical skills, project experience' },
+  { id: 'cognizant', name: 'Cognizant', category: 'consulting', description: 'IT services & consulting', interviewFocus: 'Technical aptitude, communication' },
+  
+  // Finance
+  { id: 'jpmorgan', name: 'JPMorgan Chase', category: 'finance', description: 'Global financial services', interviewFocus: 'Technical coding, finance domain' },
+  { id: 'goldman-sachs', name: 'Goldman Sachs', category: 'finance', description: 'Investment banking', interviewFocus: 'Technical excellence, problem-solving' },
+  { id: 'morgan-stanley', name: 'Morgan Stanley', category: 'finance', description: 'Financial services', interviewFocus: 'Quantitative skills, market knowledge' },
+  { id: 'citi', name: 'Citigroup', category: 'finance', description: 'Banking & financial services', interviewFocus: 'Technical skills, global perspective' },
+  { id: 'bofa', name: 'Bank of America', category: 'finance', description: 'Banking corporation', interviewFocus: 'Leadership, technical competency' },
+  { id: 'wells-fargo', name: 'Wells Fargo', category: 'finance', description: 'Financial services', interviewFocus: 'Customer focus, risk management' },
+  { id: 'hsbc', name: 'HSBC', category: 'finance', description: 'Global banking', interviewFocus: 'International experience, technical skills' },
+  { id: 'barclays', name: 'Barclays', category: 'finance', description: 'Investment bank', interviewFocus: 'Technical aptitude, market awareness' },
+  { id: 'visa', name: 'Visa', category: 'finance', description: 'Payment technology', interviewFocus: 'System design, scalability' },
+  { id: 'mastercard', name: 'Mastercard', category: 'finance', description: 'Payment solutions', interviewFocus: 'Innovation, technical skills' },
+  
+  // Indian IT
+  { id: 'tcs', name: 'TCS', category: 'indian-it', description: 'Tata Consultancy Services', interviewFocus: 'Technical fundamentals, aptitude' },
+  { id: 'infosys', name: 'Infosys', category: 'indian-it', description: 'IT services & consulting', interviewFocus: 'Technical skills, logical reasoning' },
+  { id: 'wipro', name: 'Wipro', category: 'indian-it', description: 'IT & business services', interviewFocus: 'Technical aptitude, communication' },
+  { id: 'hcl', name: 'HCL Technologies', category: 'indian-it', description: 'IT services company', interviewFocus: 'Technical skills, project experience' },
+  { id: 'tech-mahindra', name: 'Tech Mahindra', category: 'indian-it', description: 'IT services & solutions', interviewFocus: 'Domain knowledge, technical skills' },
+  { id: 'ltimindtree', name: 'LTIMindtree', category: 'indian-it', description: 'Digital solutions company', interviewFocus: 'Technical aptitude, problem-solving' },
+  
+  // Enterprise Tech
+  { id: 'sap', name: 'SAP', category: 'enterprise', description: 'Enterprise software', interviewFocus: 'ERP knowledge, technical depth' },
+  { id: 'servicenow', name: 'ServiceNow', category: 'enterprise', description: 'Cloud computing company', interviewFocus: 'Platform expertise, problem-solving' },
+  { id: 'workday', name: 'Workday', category: 'enterprise', description: 'HR & finance software', interviewFocus: 'Product knowledge, technical skills' },
+  { id: 'vmware', name: 'VMware', category: 'enterprise', description: 'Virtualization software', interviewFocus: 'Infrastructure knowledge, technical depth' },
+  { id: 'splunk', name: 'Splunk', category: 'enterprise', description: 'Data platform', interviewFocus: 'Data skills, technical problem-solving' },
+  { id: 'snowflake', name: 'Snowflake', category: 'enterprise', description: 'Cloud data platform', interviewFocus: 'Data engineering, system design' },
+  { id: 'databricks', name: 'Databricks', category: 'enterprise', description: 'Data & AI company', interviewFocus: 'Big data, machine learning' },
+  { id: 'palantir', name: 'Palantir', category: 'enterprise', description: 'Data analytics', interviewFocus: 'Problem-solving, coding, system design' },
+  
+  // Retail & E-commerce
+  { id: 'walmart', name: 'Walmart', category: 'retail', description: 'Retail corporation', interviewFocus: 'Scale, logistics, customer focus' },
+  { id: 'target', name: 'Target', category: 'retail', description: 'Retail chain', interviewFocus: 'Customer experience, technical skills' },
+  { id: 'shopify', name: 'Shopify', category: 'retail', description: 'E-commerce platform', interviewFocus: 'Entrepreneurial mindset, coding' },
+  { id: 'ebay', name: 'eBay', category: 'retail', description: 'Online marketplace', interviewFocus: 'Marketplace dynamics, technical' },
+  { id: 'uber', name: 'Uber', category: 'retail', description: 'Ride-sharing & delivery', interviewFocus: 'System design, real-time systems' },
+  { id: 'airbnb', name: 'Airbnb', category: 'retail', description: 'Vacation rentals platform', interviewFocus: 'Product sense, coding, culture' },
+  { id: 'doordash', name: 'DoorDash', category: 'retail', description: 'Food delivery platform', interviewFocus: 'Logistics, real-time systems' },
+  { id: 'instacart', name: 'Instacart', category: 'retail', description: 'Grocery delivery', interviewFocus: 'Operations, technical skills' },
+  
+  // Automotive & Industrial
+  { id: 'tesla', name: 'Tesla', category: 'automotive', description: 'Electric vehicles & energy', interviewFocus: 'Innovation, first principles, technical' },
+  { id: 'toyota', name: 'Toyota', category: 'automotive', description: 'Automotive manufacturer', interviewFocus: 'Lean methodology, quality focus' },
+  { id: 'ford', name: 'Ford', category: 'automotive', description: 'Automotive company', interviewFocus: 'Innovation, manufacturing knowledge' },
+  { id: 'gm', name: 'General Motors', category: 'automotive', description: 'Automotive manufacturer', interviewFocus: 'Technical skills, industry knowledge' },
+  { id: 'bosch', name: 'Bosch', category: 'automotive', description: 'Engineering & technology', interviewFocus: 'Engineering fundamentals, innovation' },
+  { id: 'siemens', name: 'Siemens', category: 'automotive', description: 'Industrial technology', interviewFocus: 'Domain expertise, technical depth' },
+];
+
+// Legacy companies array for backward compatibility
 export const companies: { id: Company; name: string; color: string; description: string }[] = [
   { id: 'amazon', name: 'Amazon', color: 'amazon', description: 'Leadership principles focused' },
   { id: 'google', name: 'Google', color: 'google-blue', description: 'Algorithm and design focused' },
@@ -98,6 +187,31 @@ export const companies: { id: Company; name: string; color: string; description:
   { id: 'netflix', name: 'Netflix', color: 'netflix', description: 'Culture and autonomy focused' },
   { id: 'microsoft', name: 'Microsoft', color: 'microsoft', description: 'Growth mindset focused' },
 ];
+
+// Company category labels
+export const companyCategoryLabels: Record<CompanyCategory, string> = {
+  'big-tech': 'Big Tech',
+  'consulting': 'Consulting',
+  'finance': 'Finance & Banking',
+  'indian-it': 'Indian IT',
+  'enterprise': 'Enterprise Tech',
+  'retail': 'Retail & E-commerce',
+  'automotive': 'Automotive & Industrial',
+};
+
+// Get company info by ID
+export function getCompanyInfo(companyId: string): CompanyInfo | undefined {
+  return featuredCompanies.find(c => c.id === companyId);
+}
+
+// Search companies by name
+export function searchCompanies(query: string): CompanyInfo[] {
+  const lowerQuery = query.toLowerCase();
+  return featuredCompanies.filter(c => 
+    c.name.toLowerCase().includes(lowerQuery) ||
+    c.description.toLowerCase().includes(lowerQuery)
+  );
+}
 
 export const questionTypes: { id: QuestionType; name: string; description: string; icon: string }[] = [
   { id: 'technical', name: 'Technical/Coding', description: 'Data structures, algorithms, coding problems', icon: 'Code' },
