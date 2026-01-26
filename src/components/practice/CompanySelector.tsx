@@ -72,6 +72,7 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
       'enterprise': [],
       'retail': [],
       'automotive': [],
+      'healthcare': [],
     };
     
     filteredCompanies.forEach(company => {

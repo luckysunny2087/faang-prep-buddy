@@ -91,7 +91,7 @@ export const experienceLevels: { id: string; name: string; years: string; descri
 ];
 
 // Company categories for organized display
-export type CompanyCategory = 'big-tech' | 'consulting' | 'finance' | 'indian-it' | 'enterprise' | 'retail' | 'automotive';
+export type CompanyCategory = 'big-tech' | 'consulting' | 'finance' | 'indian-it' | 'enterprise' | 'retail' | 'automotive' | 'healthcare';
 
 export interface CompanyInfo {
   id: Company;
@@ -176,6 +176,20 @@ export const featuredCompanies: CompanyInfo[] = [
   { id: 'gm', name: 'General Motors', category: 'automotive', description: 'Automotive manufacturer', interviewFocus: 'Technical skills, industry knowledge' },
   { id: 'bosch', name: 'Bosch', category: 'automotive', description: 'Engineering & technology', interviewFocus: 'Engineering fundamentals, innovation' },
   { id: 'siemens', name: 'Siemens', category: 'automotive', description: 'Industrial technology', interviewFocus: 'Domain expertise, technical depth' },
+  
+  // Healthcare & Pharma
+  { id: 'johnson-johnson', name: 'Johnson & Johnson', category: 'healthcare', description: 'Pharmaceuticals & medical devices', interviewFocus: 'Regulatory knowledge, clinical research, leadership' },
+  { id: 'pfizer', name: 'Pfizer', category: 'healthcare', description: 'Global pharmaceutical company', interviewFocus: 'Drug development, scientific thinking, compliance' },
+  { id: 'unitedhealth', name: 'UnitedHealth Group', category: 'healthcare', description: 'Health insurance & services', interviewFocus: 'Healthcare systems, data analytics, population health' },
+  { id: 'cvs-health', name: 'CVS Health', category: 'healthcare', description: 'Healthcare & pharmacy services', interviewFocus: 'Patient care, retail operations, digital health' },
+  { id: 'anthem', name: 'Elevance Health', category: 'healthcare', description: 'Health benefits company', interviewFocus: 'Healthcare policy, member experience, analytics' },
+  { id: 'abbvie', name: 'AbbVie', category: 'healthcare', description: 'Biopharmaceutical company', interviewFocus: 'R&D innovation, therapeutic expertise, compliance' },
+  { id: 'merck', name: 'Merck', category: 'healthcare', description: 'Pharmaceutical company', interviewFocus: 'Scientific rigor, drug discovery, ethical standards' },
+  { id: 'novartis', name: 'Novartis', category: 'healthcare', description: 'Global healthcare company', interviewFocus: 'Innovation, patient outcomes, global perspective' },
+  { id: 'roche', name: 'Roche', category: 'healthcare', description: 'Diagnostics & pharmaceuticals', interviewFocus: 'Personalized medicine, diagnostics, scientific depth' },
+  { id: 'medtronic', name: 'Medtronic', category: 'healthcare', description: 'Medical device company', interviewFocus: 'Medical technology, engineering, patient impact' },
+  { id: 'abbott', name: 'Abbott', category: 'healthcare', description: 'Healthcare products company', interviewFocus: 'Product development, quality systems, innovation' },
+  { id: 'cigna', name: 'Cigna', category: 'healthcare', description: 'Health services organization', interviewFocus: 'Healthcare management, customer focus, analytics' },
 ];
 
 // Legacy companies array for backward compatibility
@@ -197,6 +211,7 @@ export const companyCategoryLabels: Record<CompanyCategory, string> = {
   'enterprise': 'Enterprise Tech',
   'retail': 'Retail & E-commerce',
   'automotive': 'Automotive & Industrial',
+  'healthcare': 'Healthcare & Pharma',
 };
 
 // Get company info by ID
