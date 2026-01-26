@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Company } from '@/types/interview';
@@ -9,7 +9,7 @@ import {
   CompanyInfo,
   searchCompanies 
 } from '@/data/technologies';
-import { Building2, Search, X, Check, Globe } from 'lucide-react';
+import { Building2, Search, X, Check, Globe, Plus, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +28,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface CompanySelectorProps {
   selectedCompany: Company | null;
@@ -37,11 +39,57 @@ interface CompanySelectorProps {
 // FAANG companies to show as featured chips
 const faangCompanyIds = ['amazon', 'google', 'meta', 'apple', 'netflix', 'microsoft'];
 
+interface DatabaseCompany {
+  id: string;
+  name: string;
+  category: string;
+  description: string | null;
+  interview_focus: string | null;
+}
+
 export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<CompanyCategory | 'all'>('all');
   const [customCompany, setCustomCompany] = useState('');
+  const [isAddingCompany, setIsAddingCompany] = useState(false);
+  const [databaseCompanies, setDatabaseCompanies] = useState<DatabaseCompany[]>([]);
+
+  // Fetch user-added companies from database
+  useEffect(() => {
+    const fetchDatabaseCompanies = async () => {
+      const { data, error } = await supabase
+        .from('companies')
+        .select('id, name, category, description, interview_focus')
+        .order('name');
+      
+      if (error) {
+        console.error('Error fetching companies:', error);
+      } else if (data) {
+        setDatabaseCompanies(data);
+      }
+    };
+
+    fetchDatabaseCompanies();
+  }, []);
+
+  // Merge static companies with database companies
+  const allCompanies = useMemo(() => {
+    const staticCompanyNames = new Set(featuredCompanies.map(c => c.name.toLowerCase()));
+    
+    // Convert database companies to CompanyInfo format, excluding duplicates
+    const dbCompaniesAsInfo: CompanyInfo[] = databaseCompanies
+      .filter(c => !staticCompanyNames.has(c.name.toLowerCase()))
+      .map(c => ({
+        id: c.name.toLowerCase().replace(/\s+/g, '-'),
+        name: c.name,
+        category: (c.category as CompanyCategory) || 'enterprise',
+        description: c.description || 'User-added company',
+        interviewFocus: c.interview_focus || undefined,
+      }));
+    
+    return [...featuredCompanies, ...dbCompaniesAsInfo];
+  }, [databaseCompanies]);
 
   // Get FAANG companies for quick selection
   const faangCompanies = useMemo(() => 
@@ -52,15 +100,18 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
   // Filter companies based on search and category
   const filteredCompanies = useMemo(() => {
     let companies = searchQuery 
-      ? searchCompanies(searchQuery)
-      : featuredCompanies;
+      ? allCompanies.filter(c => 
+          c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          c.description.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : allCompanies;
     
     if (activeCategory !== 'all') {
       companies = companies.filter(c => c.category === activeCategory);
     }
     
     return companies;
-  }, [searchQuery, activeCategory]);
+  }, [searchQuery, activeCategory, allCompanies]);
 
   // Group companies by category for display
   const companiesByCategory = useMemo(() => {
@@ -76,7 +127,9 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
     };
     
     filteredCompanies.forEach(company => {
-      grouped[company.category].push(company);
+      if (grouped[company.category]) {
+        grouped[company.category].push(company);
+      }
     });
     
     return grouped;
@@ -84,8 +137,8 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
 
   // Check if selected company is a known company
   const selectedCompanyInfo = useMemo(() => 
-    selectedCompany ? featuredCompanies.find(c => c.id === selectedCompany) : null,
-    [selectedCompany]
+    selectedCompany ? allCompanies.find(c => c.id === selectedCompany || c.name === selectedCompany) : null,
+    [selectedCompany, allCompanies]
   );
 
   const handleSelectCompany = (companyId: string) => {
@@ -94,11 +147,49 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
     setSearchQuery('');
   };
 
-  const handleCustomCompanySubmit = () => {
-    if (customCompany.trim()) {
-      onSelect(customCompany.trim());
+  // Add new company to database
+  const handleAddCustomCompany = async (companyName: string) => {
+    if (!companyName.trim()) return;
+
+    setIsAddingCompany(true);
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { data, error } = await supabase
+        .from('companies')
+        .insert({
+          name: companyName.trim(),
+          category: 'enterprise',
+          description: 'Community-added company',
+          added_by: user?.id || null,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        if (error.code === '23505') {
+          // Duplicate - company already exists, just select it
+          toast.info('Company already exists in the database');
+        } else {
+          throw error;
+        }
+      } else {
+        // Add to local state
+        setDatabaseCompanies(prev => [...prev, data]);
+        toast.success(`"${companyName}" added to company database!`);
+      }
+
+      // Select the company
+      handleSelectCompany(companyName.trim());
+    } catch (err: any) {
+      console.error('Error adding company:', err);
+      toast.error('Failed to add company. Using it anyway.');
+      // Still select the company even if saving failed
+      handleSelectCompany(companyName.trim());
+    } finally {
+      setIsAddingCompany(false);
       setCustomCompany('');
-      setOpen(false);
     }
   };
 
@@ -125,9 +216,12 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" />
             Target Company (Optional)
+            <Badge variant="secondary" className="ml-2 text-xs">
+              {allCompanies.length}+ companies
+            </Badge>
           </CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
-            Select from popular companies or enter any company name globally
+            Select from our database or add a new company for everyone to use
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -165,11 +259,11 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
                   <CommandEmpty>
                     <div className="p-4 text-center space-y-3">
                       <p className="text-sm text-muted-foreground">
-                        No company found. Enter a custom company name:
+                        No company found. Add it to our database:
                       </p>
                       <div className="flex gap-2">
                         <Input
-                          placeholder="e.g., My Startup Inc."
+                          placeholder="e.g., My Company Inc."
                           value={customCompany || searchQuery}
                           onChange={(e) => setCustomCompany(e.target.value)}
                           className="flex-1"
@@ -178,14 +272,23 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
                           size="sm" 
                           onClick={() => {
                             const companyName = customCompany || searchQuery;
-                            if (companyName.trim()) {
-                              handleSelectCompany(companyName.trim());
-                            }
+                            handleAddCustomCompany(companyName);
                           }}
+                          disabled={isAddingCompany}
                         >
-                          Add
+                          {isAddingCompany ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <>
+                              <Plus className="h-4 w-4 mr-1" />
+                              Add
+                            </>
+                          )}
                         </Button>
                       </div>
+                      <p className="text-xs text-muted-foreground">
+                        This will add the company to our database for everyone to use
+                      </p>
                     </div>
                   </CommandEmpty>
                   
@@ -230,18 +333,23 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
                     );
                   })}
 
-                  {/* Custom Company Option */}
+                  {/* Add New Company Option */}
                   {searchQuery && !filteredCompanies.some(c => c.name.toLowerCase() === searchQuery.toLowerCase()) && (
-                    <CommandGroup heading="Custom Company">
+                    <CommandGroup heading="Add New Company">
                       <CommandItem
-                        value={searchQuery}
-                        onSelect={() => handleSelectCompany(searchQuery)}
+                        value={`add-${searchQuery}`}
+                        onSelect={() => handleAddCustomCompany(searchQuery)}
                         className="flex items-center gap-2"
+                        disabled={isAddingCompany}
                       >
-                        <Globe className="h-4 w-4" />
+                        {isAddingCompany ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4 text-primary" />
+                        )}
                         <div className="flex flex-col">
-                          <span>Use "{searchQuery}"</span>
-                          <span className="text-xs text-muted-foreground">Add as custom company</span>
+                          <span>Add "{searchQuery}" to database</span>
+                          <span className="text-xs text-muted-foreground">Save for everyone to use</span>
                         </div>
                       </CommandItem>
                     </CommandGroup>

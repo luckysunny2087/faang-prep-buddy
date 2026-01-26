@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      companies: {
+        Row: {
+          added_by: string | null
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          interview_focus: string | null
+          is_verified: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          added_by?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          interview_focus?: string | null
+          is_verified?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          added_by?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          interview_focus?: string | null
+          is_verified?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       interview_sessions: {
         Row: {
           company: string | null
