@@ -83,6 +83,9 @@ export default function Interview() {
             company: currentSession.company,
             questionTypes: currentSession.questionTypes,
             previousQuestions: currentSession.questions.map(q => q.question),
+            // Include resume and job description for personalized questions
+            resumeText: currentSession.resumeText,
+            jobDescription: currentSession.jobDescription,
           }
         }
       });

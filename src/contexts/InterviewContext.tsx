@@ -11,6 +11,14 @@ import {
   InterviewAnswer 
 } from '@/types/interview';
 
+interface ResumeAnalysis {
+  gaps: string[];
+  suggestions: string[];
+  matchScore: number;
+  keySkillsFound: string[];
+  missingSkills: string[];
+}
+
 interface InterviewContextType {
   // Setup state
   selectedTechnologies: TechnologyCategory[];
@@ -19,6 +27,11 @@ interface InterviewContextType {
   selectedCompany: Company | null;
   selectedDomain: Domain | null;
   selectedQuestionTypes: QuestionType[];
+  
+  // Resume & JD state
+  resumeText: string;
+  jobDescription: string;
+  resumeAnalysis: ResumeAnalysis | null;
   
   // Session state
   currentSession: InterviewSession | null;
@@ -33,6 +46,9 @@ interface InterviewContextType {
   setSelectedCompany: (company: Company | null) => void;
   setSelectedDomain: (domain: Domain | null) => void;
   setSelectedQuestionTypes: (types: QuestionType[]) => void;
+  setResumeText: (text: string) => void;
+  setJobDescription: (text: string) => void;
+  setResumeAnalysis: (analysis: ResumeAnalysis | null) => void;
   startSession: () => void;
   setCurrentSession: (session: InterviewSession | null) => void;
   addQuestion: (question: InterviewQuestion) => void;
@@ -54,6 +70,11 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
   const [selectedQuestionTypes, setSelectedQuestionTypes] = useState<QuestionType[]>([]);
+  
+  // Resume & JD state
+  const [resumeText, setResumeText] = useState<string>('');
+  const [jobDescription, setJobDescription] = useState<string>('');
+  const [resumeAnalysis, setResumeAnalysis] = useState<ResumeAnalysis | null>(null);
 
   const toggleTechnology = useCallback((tech: TechnologyCategory) => {
     setSelectedTechnologies(prev => 
@@ -81,11 +102,14 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
       questions: [],
       answers: [],
       createdAt: new Date(),
+      // Include resume and JD context
+      resumeText: resumeText || undefined,
+      jobDescription: jobDescription || undefined,
     };
     
     setCurrentSession(session);
     setCurrentQuestionIndex(0);
-  }, [selectedTechnologies, selectedRole, selectedLevel, selectedCompany, selectedQuestionTypes]);
+  }, [selectedTechnologies, selectedRole, selectedLevel, selectedCompany, selectedQuestionTypes, resumeText, jobDescription]);
 
   const addQuestion = useCallback((question: InterviewQuestion) => {
     setCurrentSession(prev => {
@@ -136,6 +160,9 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
     setSelectedCompany(null);
     setSelectedDomain(null);
     setSelectedQuestionTypes([]);
+    setResumeText('');
+    setJobDescription('');
+    setResumeAnalysis(null);
     setCurrentSession(null);
     setCurrentQuestionIndex(0);
   }, []);
@@ -149,6 +176,9 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         selectedCompany,
         selectedDomain,
         selectedQuestionTypes,
+        resumeText,
+        jobDescription,
+        resumeAnalysis,
         currentSession,
         currentQuestionIndex,
         isLoading,
@@ -159,6 +189,9 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         setSelectedCompany,
         setSelectedDomain,
         setSelectedQuestionTypes,
+        setResumeText,
+        setJobDescription,
+        setResumeAnalysis,
         startSession,
         setCurrentSession,
         addQuestion,

@@ -227,6 +227,32 @@ serve(async (req) => {
       const levelDesc = levelDescriptions[context.level] || "Professional level";
       const companyContext = getCompanyContext(context.company);
       
+      // Build context sections with priority: Company > Job Description > Resume
+      let prioritizedContext = '';
+      
+      // HIGHEST PRIORITY: Company profile and culture
+      if (companyContext) {
+        prioritizedContext += `\n\n=== HIGHEST PRIORITY: COMPANY CONTEXT ===\n${companyContext}`;
+      }
+      
+      // HIGH PRIORITY: Job Description requirements
+      if (context.jobDescription) {
+        prioritizedContext += `\n\n=== HIGH PRIORITY: JOB DESCRIPTION ===
+Focus questions on these specific requirements from the job posting:
+${context.jobDescription.substring(0, 2000)}
+${context.jobDescription.length > 2000 ? '...[truncated]' : ''}
+
+Generate questions that directly test the skills and competencies mentioned in this job description.`;
+      }
+      
+      // SUPPORTING CONTEXT: Resume (use to personalize, but don't over-rely)
+      if (context.resumeText) {
+        prioritizedContext += `\n\n=== SUPPORTING CONTEXT: CANDIDATE RESUME ===
+Use this to tailor questions to the candidate's background, but prioritize testing job requirements:
+${context.resumeText.substring(0, 1500)}
+${context.resumeText.length > 1500 ? '...[truncated]' : ''}`;
+      }
+      
       systemPrompt = `You are an expert interview coach specializing in technical and behavioral interviews for top-tier companies worldwide.
 
 CANDIDATE PROFILE:
@@ -235,16 +261,26 @@ CANDIDATE PROFILE:
 - Experience Level: ${context.level} - ${levelDesc}
 - Question Types Required: ${Array.isArray(context.questionTypes) ? context.questionTypes.join(', ') : 'technical'}
 ${context.domain ? `- Industry Domain: ${context.domain}` : ''}
-${companyContext}
+${prioritizedContext}
+
+QUESTION GENERATION PRIORITIES (STRICTLY FOLLOW THIS ORDER):
+1. COMPANY INTERVIEW STYLE - If company is specified, match their known interview patterns and values
+2. JOB DESCRIPTION - Questions MUST test skills/competencies from the JD if provided
+3. CANDIDATE BACKGROUND - Personalize based on resume, but focus on JD requirements
+4. GENERAL BEST PRACTICES - Only fall back to general questions if no JD/company context
 
 QUESTION QUALITY GUIDELINES:
-1. Questions should be calibrated to the exact experience level
-2. For behavioral questions: Use "Tell me about a time..." format with specific scenarios
-3. For technical questions: Include context and real-world applicability
-4. For system design: Scale appropriately for the level (junior = component design, senior = full system)
-5. Questions should be specific, not generic - reference the technology stack when relevant`;
+1. Questions should be calibrated to the exact experience level (this is HARD/EXPERT level - make it challenging)
+2. For behavioral questions: Use "Tell me about a time..." format with specific scenarios related to JD requirements
+3. For technical questions: Include context and real-world applicability from the JD
+4. For system design: Scale appropriately for the level and reference systems the company actually uses
+5. Questions should be specific, not generic - reference the technology stack and JD requirements`;
 
-      userPrompt = `Generate ONE highly relevant interview question.
+      userPrompt = `Generate ONE highly relevant interview question that:
+1. Aligns with the company's interview culture (if specified)
+2. Tests a specific requirement from the job description (if provided)
+3. Is appropriately challenging for the experience level
+
 ${context.previousQuestions?.length ? `AVOID these topics already covered: ${context.previousQuestions.slice(-3).join('; ')}` : ''}
 
 Return ONLY valid JSON: {"question": "the complete question text", "type": "technical|behavioral|system-design|domain-knowledge"}`;

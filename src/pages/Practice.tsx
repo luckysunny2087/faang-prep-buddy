@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { TechnologySelector } from '@/components/practice/TechnologySelector';
 import { RoleSelector } from '@/components/practice/RoleSelector';
@@ -6,6 +5,7 @@ import { LevelSelector } from '@/components/practice/LevelSelector';
 import { DomainSelector } from '@/components/practice/DomainSelector';
 import { CompanySelector } from '@/components/practice/CompanySelector';
 import { QuestionTypeSelector } from '@/components/practice/QuestionTypeSelector';
+import { ResumeJobDescriptionInput } from '@/components/practice/ResumeJobDescriptionInput';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useInterview } from '@/contexts/InterviewContext';
@@ -28,6 +28,7 @@ export default function Practice() {
     setSelectedDomain,
     setSelectedQuestionTypes,
     startSession,
+    jobDescription,
   } = useInterview();
 
   const handleToggleQuestionType = (type: QuestionType) => {
@@ -54,9 +55,12 @@ export default function Practice() {
         </div>
 
         <div className="space-y-6">
-          <TechnologySelector 
-            selectedTechnologies={selectedTechnologies} 
-            onToggle={toggleTechnology} 
+          {/* Resume & Job Description - Moved to top for priority */}
+          <ResumeJobDescriptionInput />
+          
+          <CompanySelector 
+            selectedCompany={selectedCompany} 
+            onSelect={setSelectedCompany} 
           />
           <RoleSelector 
             selectedRole={selectedRole} 
@@ -66,13 +70,13 @@ export default function Practice() {
             selectedLevel={selectedLevel} 
             onSelect={setSelectedLevel} 
           />
+          <TechnologySelector 
+            selectedTechnologies={selectedTechnologies} 
+            onToggle={toggleTechnology} 
+          />
           <DomainSelector 
             selectedDomain={selectedDomain} 
             onSelect={setSelectedDomain} 
-          />
-          <CompanySelector 
-            selectedCompany={selectedCompany} 
-            onSelect={setSelectedCompany} 
           />
           <QuestionTypeSelector 
             selectedTypes={selectedQuestionTypes} 
@@ -88,6 +92,7 @@ export default function Practice() {
             >
               <Sparkles className="mr-2 h-5 w-5" />
               Start Interview Session
+              {jobDescription && ' (with JD context)'}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
