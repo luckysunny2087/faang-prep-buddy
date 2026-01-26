@@ -7,20 +7,102 @@ const corsHeaders = {
 };
 
 const MODELS = [
-  "gpt-4o-mini",
-  "gpt-4o",
-  "openai/gpt-4o-mini",
-  "openai/gpt-4o",
-  "google/gemini-2.0-flash",
+  "google/gemini-3-flash-preview",
+  "google/gemini-2.5-flash",
+  "openai/gpt-5-nano",
 ];
+
+// Rich company context for better question generation
+const companyContextMap: Record<string, { interviewStyle: string; cultureValues: string[]; questionFocus: string[] }> = {
+  amazon: {
+    interviewStyle: 'Heavily behavioral with Leadership Principles focus. Expect "Tell me about a time" questions using STAR method.',
+    cultureValues: ['Customer Obsession', 'Ownership', 'Invent and Simplify', 'Bias for Action', 'Earn Trust', 'Dive Deep', 'Have Backbone', 'Deliver Results'],
+    questionFocus: ['Leadership Principles stories', 'Scalability and distributed systems', 'Data-driven decision making', 'Ownership and accountability'],
+  },
+  google: {
+    interviewStyle: 'Strong focus on algorithms, data structures, and system design. Values "Googleyness" - intellectual humility and collaboration.',
+    cultureValues: ['Focus on the user', 'Intellectual humility', 'Collaborative problem-solving', 'Comfort with ambiguity'],
+    questionFocus: ['Algorithm optimization', 'Large-scale system design', 'Code quality and testing', 'Cross-functional collaboration'],
+  },
+  meta: {
+    interviewStyle: 'Fast-paced coding rounds with emphasis on product sense. Values shipping fast and learning from metrics.',
+    cultureValues: ['Move Fast', 'Be Bold', 'Focus on Impact', 'Be Open', 'Build Social Value'],
+    questionFocus: ['Efficient coding under time pressure', 'Product thinking', 'Scaling for billions of users', 'A/B testing mindset'],
+  },
+  apple: {
+    interviewStyle: 'Team-specific interviews with deep technical dives. Strong emphasis on craftsmanship and attention to detail.',
+    cultureValues: ['Excellence in craft', 'User privacy', 'Simplicity', 'Innovation', 'Attention to detail'],
+    questionFocus: ['Deep technical expertise', 'Design sensibility', 'Privacy considerations', 'Quality over quantity'],
+  },
+  netflix: {
+    interviewStyle: 'Culture-heavy interviews focused on freedom and responsibility. Expects senior-level judgment from all candidates.',
+    cultureValues: ['Judgment', 'Selflessness', 'Courage', 'Communication', 'Inclusion', 'Integrity', 'Passion', 'Innovation', 'Curiosity'],
+    questionFocus: ['Independent decision-making', 'Giving and receiving feedback', 'Context over control', 'High performance expectations'],
+  },
+  microsoft: {
+    interviewStyle: 'Growth mindset focused with collaborative problem-solving. Values learning from failure and cross-team collaboration.',
+    cultureValues: ['Growth Mindset', 'Customer obsession', 'Diversity and inclusion', 'One Microsoft', 'Making a difference'],
+    questionFocus: ['Learning from mistakes', 'Collaboration across teams', 'Customer impact', 'Technical breadth and depth'],
+  },
+  mckinsey: {
+    interviewStyle: 'Rigorous case interviews testing structured problem-solving. Also evaluates personal experience and leadership.',
+    cultureValues: ['Client impact', 'Analytical rigor', 'Obligation to dissent', 'Professional development'],
+    questionFocus: ['Case structuring', 'Quantitative analysis', 'Synthesis and recommendation', 'Leadership presence'],
+  },
+  'goldman-sachs': {
+    interviewStyle: 'Technical coding with finance domain questions. Values commercial awareness and teamwork.',
+    cultureValues: ['Client Service', 'Excellence', 'Integrity', 'Teamwork'],
+    questionFocus: ['Algorithmic problem-solving', 'Financial markets knowledge', 'Risk assessment', 'Team collaboration'],
+  },
+  jpmorgan: {
+    interviewStyle: 'Technical interviews with behavioral components. Strong focus on risk awareness and regulatory understanding.',
+    cultureValues: ['Integrity', 'Fairness', 'Responsibility', 'Excellence'],
+    questionFocus: ['Coding proficiency', 'System design for finance', 'Risk management', 'Regulatory compliance'],
+  },
+  tcs: {
+    interviewStyle: 'Technical fundamentals focus with aptitude testing. Values adaptability and communication skills.',
+    cultureValues: ['Customer focus', 'Integrity', 'Learning', 'Excellence', 'Teamwork'],
+    questionFocus: ['Core programming concepts', 'Database fundamentals', 'Logical reasoning', 'Communication skills'],
+  },
+  infosys: {
+    interviewStyle: 'Aptitude-based screening followed by technical interviews. Values logical reasoning and learning ability.',
+    cultureValues: ['Learning', 'Integrity', 'Excellence', 'Respect', 'Fairness'],
+    questionFocus: ['Programming basics', 'Problem-solving', 'Database queries', 'Communication'],
+  },
+};
+
+function getCompanyContext(company: string | null | undefined): string {
+  if (!company) return '';
+  
+  const normalized = company.toLowerCase().replace(/\s+/g, '-');
+  const context = companyContextMap[normalized];
+  
+  if (context) {
+    return `
+COMPANY CONTEXT for ${company}:
+- Interview Style: ${context.interviewStyle}
+- Culture Values: ${context.cultureValues.join(', ')}
+- Question Focus Areas: ${context.questionFocus.join(', ')}
+
+Generate questions that SPECIFICALLY align with ${company}'s interview style and culture.
+For behavioral questions, structure them around their core values.
+For technical questions, focus on their typical interview patterns.
+`;
+  }
+  
+  // For custom/unknown companies
+  return `
+Generate professional interview questions tailored for ${company}.
+Focus on industry-relevant technical skills and professional behavioral competencies.
+`;
+}
 
 async function callAIWithValidation(systemPrompt: string, userPrompt: string, maxRetries = 2): Promise<any> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
-  if (!LOVABLE_API_KEY && !OPENAI_API_KEY) {
-    console.error("No API keys found (LOVABLE_API_KEY or OPENAI_API_KEY)");
-    throw new Error("AI service is not configured (API keys missing)");
+  if (!LOVABLE_API_KEY) {
+    console.error("LOVABLE_API_KEY not found");
+    throw new Error("AI service is not configured");
   }
 
   let lastError: Error | null = null;
@@ -30,21 +112,14 @@ async function callAIWithValidation(systemPrompt: string, userPrompt: string, ma
       try {
         console.log(`Calling AI with model ${model}, attempt ${attempt + 1}`);
 
-        const isDirectOpenAI = OPENAI_API_KEY && model.startsWith("gpt");
-        const url = isDirectOpenAI
-          ? "https://api.openai.com/v1/chat/completions"
-          : "https://ai.gateway.lovable.dev/v1/chat/completions";
-
-        const apiKey = isDirectOpenAI ? OPENAI_API_KEY : LOVABLE_API_KEY;
-
-        const response = await fetch(url, {
+        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${apiKey}`,
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: isDirectOpenAI ? model.replace("openai/", "") : model,
+            model,
             messages: [
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt }
@@ -84,7 +159,6 @@ async function callAIWithValidation(systemPrompt: string, userPrompt: string, ma
         // Clean markdown and find JSON block
         let cleanedContent = content.replace(/```json\s?/, "").replace(/```\s?$/, "").trim();
 
-        // More robust JSON extraction: find the first { and the last }
         const firstBrace = cleanedContent.indexOf('{');
         const lastBrace = cleanedContent.lastIndexOf('}');
 
@@ -96,12 +170,11 @@ async function callAIWithValidation(systemPrompt: string, userPrompt: string, ma
         const jsonString = cleanedContent.substring(firstBrace, lastBrace + 1);
 
         try {
-          // Pre-cleaning
           const sanitizedJson = jsonString
-            .replace(/,\s*([}\]])/g, '$1') // remove trailing commas
-            .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // remove control characters
-            .replace(/[\u201C\u201D]/g, '"') // replace smart quotes
-            .replace(/(?<=: \".*)\n(?=.*\"[,}])/, " "); // remove newlines inside strings
+            .replace(/,\s*([}\]])/g, '$1')
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+            .replace(/[\u201C\u201D]/g, '"')
+            .replace(/(?<=: \".*)\n(?=.*\"[,}])/, " ");
 
           return JSON.parse(sanitizedJson);
         } catch (e) {
@@ -118,9 +191,8 @@ async function callAIWithValidation(systemPrompt: string, userPrompt: string, ma
         lastError = error instanceof Error ? error : new Error(String(error));
         console.error(`Attempt failed with ${model}:`, lastError.message);
 
-        // If it's a structural error (not a network/gateway error), try next model
         if (lastError.message.includes("JSON") || lastError.message.includes("object found") || lastError.message.includes("content")) {
-          continue; // Try next attempt/model
+          continue;
         }
       }
     }
@@ -128,6 +200,15 @@ async function callAIWithValidation(systemPrompt: string, userPrompt: string, ma
 
   throw lastError || new Error("All models failed to return valid JSON");
 }
+
+// Level descriptions for better question calibration
+const levelDescriptions: Record<string, string> = {
+  l1: "Entry-level (0-2 years): Focus on fundamentals, basic problem-solving, and learning ability",
+  l2: "Mid-level (2-5 years): Expects solid technical skills, some project experience, independent contributor",
+  l3: "Senior (5-7 years): Deep expertise, mentoring ability, architectural thinking",
+  l4: "Staff/Lead (7-10 years): Technical leadership, cross-team impact, strategic decisions",
+  l5: "Principal/Distinguished (10+ years): Industry expertise, organization-wide impact, innovation",
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -143,57 +224,82 @@ serve(async (req) => {
 
     if (action === 'generate-question') {
       const technologies = Array.isArray(context.technologies) ? context.technologies.join(', ') : context.technology || 'General';
-      systemPrompt = `You are an expert FAANG interview coach. Generate interview questions for ${technologies} technology stack, for a ${context.role} at ${context.level} level.${context.company ? ` Focus on ${context.company}-style questions.` : ''}${context.domain ? ` The questions should be relevant to the ${context.domain} industry domain.` : ''} Question types to include: ${Array.isArray(context.questionTypes) ? context.questionTypes.join(', ') : 'technical'}.`;
-      userPrompt = `Generate ONE new interview question. ${context.previousQuestions?.length ? `Avoid these previous questions: ${context.previousQuestions.join('; ')}` : ''} Return JSON only: {"question": "the question text", "type": "technical|behavioral|system-design|domain-knowledge"}`;
+      const levelDesc = levelDescriptions[context.level] || "Professional level";
+      const companyContext = getCompanyContext(context.company);
+      
+      systemPrompt = `You are an expert interview coach specializing in technical and behavioral interviews for top-tier companies worldwide.
+
+CANDIDATE PROFILE:
+- Technologies: ${technologies}
+- Role: ${context.role}
+- Experience Level: ${context.level} - ${levelDesc}
+- Question Types Required: ${Array.isArray(context.questionTypes) ? context.questionTypes.join(', ') : 'technical'}
+${context.domain ? `- Industry Domain: ${context.domain}` : ''}
+${companyContext}
+
+QUESTION QUALITY GUIDELINES:
+1. Questions should be calibrated to the exact experience level
+2. For behavioral questions: Use "Tell me about a time..." format with specific scenarios
+3. For technical questions: Include context and real-world applicability
+4. For system design: Scale appropriately for the level (junior = component design, senior = full system)
+5. Questions should be specific, not generic - reference the technology stack when relevant`;
+
+      userPrompt = `Generate ONE highly relevant interview question.
+${context.previousQuestions?.length ? `AVOID these topics already covered: ${context.previousQuestions.slice(-3).join('; ')}` : ''}
+
+Return ONLY valid JSON: {"question": "the complete question text", "type": "technical|behavioral|system-design|domain-knowledge"}`;
     } else if (action === 'evaluate-answer') {
-      systemPrompt = `You are an expert FAANG interviewer evaluating a ${context.level} ${context.role} candidate's answer.${context.domain ? ` Consider the ${context.domain} industry context.` : ''}`;
-      userPrompt = `Question: ${context.question}\n\nCandidate's Answer: ${context.answer}\n\nEvaluate this answer. Return JSON only: {"score": 1-10, "feedback": "detailed feedback", "strengths": ["strength1", "strength2"], "improvements": ["area1", "area2"]}`;
+      const levelDesc = levelDescriptions[context.level] || "Professional level";
+      
+      systemPrompt = `You are an expert interviewer evaluating a ${context.level} ${context.role} candidate's answer.
+Experience Level Context: ${levelDesc}
+${context.domain ? `Industry Domain: ${context.domain}` : ''}
+
+Evaluate fairly based on what's expected at this experience level. Be encouraging but honest.
+Provide actionable feedback that helps the candidate improve.`;
+
+      userPrompt = `Question: ${context.question}
+
+Candidate's Answer: ${context.answer}
+
+Evaluate this answer considering the candidate's experience level.
+Return JSON only: {"score": 1-10, "feedback": "2-3 sentences of specific feedback", "strengths": ["strength1", "strength2"], "improvements": ["specific improvement1", "specific improvement2"]}`;
     } else if (action === 'generate-learning-path') {
       const { expertiseLevel, learningFocus, targetRole, targetCompany, timeline } = context;
-      systemPrompt = `You are an elite FAANG interview coach and technical mentor. 
-      Your task is to create a highly personalized, expert-level learning roadmap for a candidate.
+      systemPrompt = `You are an elite interview coach and technical mentor. 
+      Create a highly personalized learning roadmap.
       
       Candidate Profile:
       - Current Level: ${expertiseLevel}
       - Primary Focus: ${learningFocus}
       ${targetRole ? `- Target Role: ${targetRole}` : ''}
       ${targetCompany ? `- Target Company: ${targetCompany}` : ''}
-      ${timeline ? `- Preparation Timeline: ${timeline}` : ''}
-      
-      The roadmap should be practical, prioritized, and specifically tailored to the nuances of ${targetCompany || 'top-tier tech companies'}.`;
+      ${timeline ? `- Preparation Timeline: ${timeline}` : ''}`;
 
       userPrompt = `Create a structured learning path with 4-5 high-impact stages. 
       For each stage, provide:
-      1. A professional title.
-      2. A concise, strategic description of why this stage is critical for ${targetRole || 'their career'}.
-      3. A list of 4-6 specific, advanced topics or skills to master.
+      1. A professional title
+      2. A concise, strategic description
+      3. A list of 4-6 specific topics to master
       
       Respond ONLY with valid JSON.
-      Format: {"title": "The Master Roadmap", "description": "High-level strategy", "stages": [{"title": "Stage 1", "description": "Why this matters", "topics": ["specific topic 1", "topic 2"]}]}`;
+      Format: {"title": "The Master Roadmap", "description": "High-level strategy", "stages": [{"title": "Stage 1", "description": "Why this matters", "topics": ["topic 1", "topic 2"]}]}`;
     } else if (action === 'ask-faq') {
       systemPrompt = `You are the InterviewPrep AI Support Assistant. 
-      Your goal is to help users understand how this platform works.
+      Help users understand how this platform works.
       
-      Platform Information:
-      - App Name: InterviewPrep (formerly FAANG Prep Buddy)
-      - Key Features: AI-powered interview practice, real-time feedback with scores, technical/behavioral/system design questions, company-specific tracks (Amazon, Google, Meta, Apple, Netflix, Microsoft), progress tracking/dashboard, resource library.
-      - How it works: Users select their role, level, and tech stack. The AI generates a tailored 10-question interview. Users type answers and get 1-10 scores with detailed feedback.
-      - Pricing: Free tier available, Pro tier ($29/month) for unlimited interviews and advanced analytics.
-      - FAQ Context: You should be polite, encouraging, and helpful. If you don't know the answer, tell them to contact support.
+      Platform: InterviewPrep - AI-powered interview practice with real-time feedback
+      Key Features: Technical/behavioral/system design questions, company-specific tracks (70+ companies), progress tracking
       
       Respond in a conversational but professional tone. Keep answers concise (1-3 sentences).
-      You MUST return your answer in a JSON object with the key "answer".`;
+      Return your answer in JSON: {"answer": "your answer text here"}`;
 
-      userPrompt = `Answer the following user question about InterviewPrep.
-      Return strictly valid JSON: {"answer": "your answer text here"}
-      
-      User Question: ${context.question}`;
+      userPrompt = `User Question: ${context.question}
+Return strictly valid JSON: {"answer": "your answer text here"}`;
     }
 
     const result = await callAIWithValidation(systemPrompt, userPrompt);
 
-    // Safety check: if result is an object but doesn't have "answer", 
-    // try to find any string property to use as the answer
     if (action === 'ask-faq' && result && !result.answer) {
       const firstStringKey = Object.keys(result).find(key => typeof result[key] === 'string');
       if (firstStringKey) {
