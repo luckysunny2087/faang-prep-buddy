@@ -1,14 +1,15 @@
 import { Layout } from '@/components/layout/Layout';
 import { motion } from 'framer-motion';
-import { featuredCompanies, companyCategoryLabels, CompanyCategory, CompanyInfo } from '@/data/technologies';
+import { companyCategoryLabels, CompanyCategory, CompanyInfo } from '@/data/technologies';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Search, Building2, Target, GraduationCap, Sparkles } from 'lucide-react';
+import { ArrowRight, Search, Target, GraduationCap, Sparkles, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { useCompanies } from '@/hooks/useCompanies';
 
 type FilterCategory = 'all' | CompanyCategory;
 
@@ -69,9 +70,10 @@ const Companies = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
+  const { allCompanies, isLoading } = useCompanies();
 
   const filteredCompanies = useMemo(() => {
-    let result = featuredCompanies;
+    let result = allCompanies;
 
     // Filter by category
     if (selectedCategory !== 'all') {
@@ -90,15 +92,15 @@ const Companies = () => {
     }
 
     return result;
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, allCompanies]);
 
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: featuredCompanies.length };
-    featuredCompanies.forEach((company) => {
+    const counts: Record<string, number> = { all: allCompanies.length };
+    allCompanies.forEach((company) => {
       counts[company.category] = (counts[company.category] || 0) + 1;
     });
     return counts;
-  }, []);
+  }, [allCompanies]);
 
   return (
     <Layout>
@@ -115,7 +117,7 @@ const Companies = () => {
               <div className="flex items-center gap-2 mb-4">
                 <Badge variant="secondary" className="gap-1.5">
                   <Sparkles className="h-3 w-3" />
-                  {featuredCompanies.length}+ Companies
+                  {allCompanies.length}+ Companies
                 </Badge>
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-tight mb-4 md:mb-6">
@@ -173,7 +175,12 @@ const Companies = () => {
 
         {/* Companies Grid */}
         <section className="py-10 md:py-16 container">
-          {filteredCompanies.length > 0 ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-2 text-muted-foreground">Loading companies...</span>
+            </div>
+          ) : filteredCompanies.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {filteredCompanies.map((company, index) => (
                 <CompanyCard key={company.id} company={company} index={index} navigate={navigate} />
