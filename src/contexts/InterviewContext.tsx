@@ -29,6 +29,7 @@ interface InterviewContextType {
   selectedCompanyDetails: CompanyDetails | null;
   selectedDomain: Domain | null;
   selectedQuestionTypes: QuestionType[];
+  selectedTimerDuration: number | null;
   
   // Resume & JD state
   resumeText: string;
@@ -48,6 +49,7 @@ interface InterviewContextType {
   setSelectedCompany: (company: Company | null, details?: CompanyDetails | null) => void;
   setSelectedDomain: (domain: Domain | null) => void;
   setSelectedQuestionTypes: (types: QuestionType[]) => void;
+  setSelectedTimerDuration: (duration: number | null) => void;
   setResumeText: (text: string) => void;
   setJobDescription: (text: string) => void;
   setResumeAnalysis: (analysis: ResumeAnalysis | null) => void;
@@ -73,6 +75,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
   const [selectedCompanyDetails, setSelectedCompanyDetails] = useState<CompanyDetails | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
   const [selectedQuestionTypes, setSelectedQuestionTypes] = useState<QuestionType[]>([]);
+  const [selectedTimerDuration, setSelectedTimerDuration] = useState<number | null>(null);
   
   // Wrapper to set both company and details
   const setSelectedCompany = useCallback((company: Company | null, details?: CompanyDetails | null) => {
@@ -108,6 +111,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
       level: selectedLevel,
       company: selectedCompany || undefined,
       companyDetails: selectedCompanyDetails || undefined,
+      timerDuration: selectedTimerDuration || undefined,
       questionTypes: selectedQuestionTypes.length > 0 ? selectedQuestionTypes : ['technical', 'behavioral', 'system-design', 'domain-knowledge'],
       questions: [],
       answers: [],
@@ -119,7 +123,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
     
     setCurrentSession(session);
     setCurrentQuestionIndex(0);
-  }, [selectedTechnologies, selectedRole, selectedLevel, selectedCompany, selectedCompanyDetails, selectedQuestionTypes, resumeText, jobDescription]);
+  }, [selectedTechnologies, selectedRole, selectedLevel, selectedCompany, selectedCompanyDetails, selectedTimerDuration, selectedQuestionTypes, resumeText, jobDescription]);
 
   const addQuestion = useCallback((question: InterviewQuestion) => {
     setCurrentSession(prev => {
@@ -170,12 +174,13 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
     setSelectedCompany(null);
     setSelectedDomain(null);
     setSelectedQuestionTypes([]);
+    setSelectedTimerDuration(null);
     setResumeText('');
     setJobDescription('');
     setResumeAnalysis(null);
     setCurrentSession(null);
     setCurrentQuestionIndex(0);
-  }, []);
+  }, [setSelectedCompany]);
 
   return (
     <InterviewContext.Provider
@@ -187,6 +192,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         selectedCompanyDetails,
         selectedDomain,
         selectedQuestionTypes,
+        selectedTimerDuration,
         resumeText,
         jobDescription,
         resumeAnalysis,
@@ -200,6 +206,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         setSelectedCompany,
         setSelectedDomain,
         setSelectedQuestionTypes,
+        setSelectedTimerDuration,
         setResumeText,
         setJobDescription,
         setResumeAnalysis,
