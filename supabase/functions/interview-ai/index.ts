@@ -71,18 +71,19 @@ const companyContextMap: Record<string, { interviewStyle: string; cultureValues:
   },
 };
 
-function getCompanyContext(company: string | null | undefined): string {
+function getCompanyContext(company: string | null | undefined, companyDetails?: { description?: string; interviewFocus?: string; category?: string }): string {
   if (!company) return '';
   
   const normalized = company.toLowerCase().replace(/\s+/g, '-');
-  const context = companyContextMap[normalized];
+  const staticContext = companyContextMap[normalized];
   
-  if (context) {
+  // If we have static company context, use it
+  if (staticContext) {
     return `
 COMPANY CONTEXT for ${company}:
-- Interview Style: ${context.interviewStyle}
-- Culture Values: ${context.cultureValues.join(', ')}
-- Question Focus Areas: ${context.questionFocus.join(', ')}
+- Interview Style: ${staticContext.interviewStyle}
+- Culture Values: ${staticContext.cultureValues.join(', ')}
+- Question Focus Areas: ${staticContext.questionFocus.join(', ')}
 
 Generate questions that SPECIFICALLY align with ${company}'s interview style and culture.
 For behavioral questions, structure them around their core values.
@@ -90,7 +91,25 @@ For technical questions, focus on their typical interview patterns.
 `;
   }
   
-  // For custom/unknown companies
+  // Use database-provided company details if available
+  if (companyDetails && (companyDetails.description || companyDetails.interviewFocus)) {
+    let context = `\nCOMPANY CONTEXT for ${company}:\n`;
+    
+    if (companyDetails.category) {
+      context += `- Industry: ${companyDetails.category}\n`;
+    }
+    if (companyDetails.description) {
+      context += `- Company Description: ${companyDetails.description}\n`;
+    }
+    if (companyDetails.interviewFocus) {
+      context += `- Interview Focus Areas: ${companyDetails.interviewFocus}\n`;
+    }
+    
+    context += `\nGenerate interview questions that are specifically tailored to ${company}'s industry, business focus, and the interview topics they emphasize.\n`;
+    return context;
+  }
+  
+  // For custom/unknown companies without details
   return `
 Generate professional interview questions tailored for ${company}.
 Focus on industry-relevant technical skills and professional behavioral competencies.
@@ -225,7 +244,9 @@ serve(async (req) => {
     if (action === 'generate-question') {
       const technologies = Array.isArray(context.technologies) ? context.technologies.join(', ') : context.technology || 'General';
       const levelDesc = levelDescriptions[context.level] || "Professional level";
-      const companyContext = getCompanyContext(context.company);
+      
+      // Get company context - use provided companyDetails if available
+      const companyContext = getCompanyContext(context.company, context.companyDetails);
       
       // Build context sections with priority: Company > Job Description > Resume
       let prioritizedContext = '';

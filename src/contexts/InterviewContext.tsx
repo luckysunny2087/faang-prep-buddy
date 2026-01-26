@@ -5,6 +5,7 @@ import {
   ExperienceLevel, 
   QuestionType, 
   Company,
+  CompanyDetails,
   Domain,
   InterviewSession,
   InterviewQuestion,
@@ -25,6 +26,7 @@ interface InterviewContextType {
   selectedRole: Role | null;
   selectedLevel: ExperienceLevel | null;
   selectedCompany: Company | null;
+  selectedCompanyDetails: CompanyDetails | null;
   selectedDomain: Domain | null;
   selectedQuestionTypes: QuestionType[];
   
@@ -43,7 +45,7 @@ interface InterviewContextType {
   toggleTechnology: (tech: TechnologyCategory) => void;
   setSelectedRole: (role: Role | null) => void;
   setSelectedLevel: (level: ExperienceLevel | null) => void;
-  setSelectedCompany: (company: Company | null) => void;
+  setSelectedCompany: (company: Company | null, details?: CompanyDetails | null) => void;
   setSelectedDomain: (domain: Domain | null) => void;
   setSelectedQuestionTypes: (types: QuestionType[]) => void;
   setResumeText: (text: string) => void;
@@ -67,9 +69,16 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
   const [selectedTechnologies, setSelectedTechnologies] = useState<TechnologyCategory[]>([]);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<ExperienceLevel | null>(null);
-  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+  const [selectedCompany, setSelectedCompanyState] = useState<Company | null>(null);
+  const [selectedCompanyDetails, setSelectedCompanyDetails] = useState<CompanyDetails | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
   const [selectedQuestionTypes, setSelectedQuestionTypes] = useState<QuestionType[]>([]);
+  
+  // Wrapper to set both company and details
+  const setSelectedCompany = useCallback((company: Company | null, details?: CompanyDetails | null) => {
+    setSelectedCompanyState(company);
+    setSelectedCompanyDetails(details ?? null);
+  }, []);
   
   // Resume & JD state
   const [resumeText, setResumeText] = useState<string>('');
@@ -98,6 +107,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
       role: selectedRole,
       level: selectedLevel,
       company: selectedCompany || undefined,
+      companyDetails: selectedCompanyDetails || undefined,
       questionTypes: selectedQuestionTypes.length > 0 ? selectedQuestionTypes : ['technical', 'behavioral', 'system-design', 'domain-knowledge'],
       questions: [],
       answers: [],
@@ -109,7 +119,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
     
     setCurrentSession(session);
     setCurrentQuestionIndex(0);
-  }, [selectedTechnologies, selectedRole, selectedLevel, selectedCompany, selectedQuestionTypes, resumeText, jobDescription]);
+  }, [selectedTechnologies, selectedRole, selectedLevel, selectedCompany, selectedCompanyDetails, selectedQuestionTypes, resumeText, jobDescription]);
 
   const addQuestion = useCallback((question: InterviewQuestion) => {
     setCurrentSession(prev => {
@@ -174,6 +184,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         selectedRole,
         selectedLevel,
         selectedCompany,
+        selectedCompanyDetails,
         selectedDomain,
         selectedQuestionTypes,
         resumeText,

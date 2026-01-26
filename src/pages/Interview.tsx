@@ -81,6 +81,7 @@ export default function Interview() {
             role: currentSession.role,
             level: currentSession.level,
             company: currentSession.company,
+            companyDetails: currentSession.companyDetails,
             questionTypes: currentSession.questionTypes,
             previousQuestions: currentSession.questions.map(q => q.question),
             // Include resume and job description for personalized questions

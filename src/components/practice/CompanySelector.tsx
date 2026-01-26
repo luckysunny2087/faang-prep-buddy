@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Company } from '@/types/interview';
+import { Company, CompanyDetails } from '@/types/interview';
 import { 
   featuredCompanies, 
   companyCategoryLabels, 
@@ -30,10 +30,11 @@ import {
 } from '@/components/ui/popover';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { AddCompanyDialog } from './AddCompanyDialog';
 
 interface CompanySelectorProps {
   selectedCompany: Company | null;
-  onSelect: (company: Company | null) => void;
+  onSelect: (company: Company | null, details?: CompanyDetails | null) => void;
 }
 
 // FAANG companies to show as featured chips
@@ -54,6 +55,8 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
   const [customCompany, setCustomCompany] = useState('');
   const [isAddingCompany, setIsAddingCompany] = useState(false);
   const [databaseCompanies, setDatabaseCompanies] = useState<DatabaseCompany[]>([]);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [pendingCompanyName, setPendingCompanyName] = useState('');
 
   // Fetch user-added companies from database
   useEffect(() => {
@@ -141,16 +144,48 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
     [selectedCompany, allCompanies]
   );
 
-  const handleSelectCompany = (companyId: string) => {
-    onSelect(companyId);
+  const handleSelectCompany = (companyId: string, providedDetails?: CompanyDetails) => {
+    // Look up company details from static or database companies
+    const staticCompany = featuredCompanies.find(c => c.id === companyId || c.name === companyId);
+    const dbCompany = databaseCompanies.find(c => c.name.toLowerCase() === companyId.toLowerCase());
+    
+    let details: CompanyDetails | undefined = providedDetails;
+    
+    if (!details) {
+      if (staticCompany) {
+        details = {
+          description: staticCompany.description,
+          interviewFocus: staticCompany.interviewFocus,
+          category: staticCompany.category,
+        };
+      } else if (dbCompany) {
+        details = {
+          description: dbCompany.description || undefined,
+          interviewFocus: dbCompany.interview_focus || undefined,
+          category: dbCompany.category,
+        };
+      }
+    }
+    
+    onSelect(companyId, details);
     setOpen(false);
     setSearchQuery('');
   };
 
-  // Add new company to database
-  const handleAddCustomCompany = async (companyName: string) => {
-    if (!companyName.trim()) return;
+  // Open dialog for adding a new company
+  const handleOpenAddDialog = (companyName: string) => {
+    setPendingCompanyName(companyName.trim());
+    setShowAddDialog(true);
+    setOpen(false);
+  };
 
+  // Add new company to database with full details
+  const handleAddCompanyWithDetails = async (formData: {
+    name: string;
+    category: CompanyCategory;
+    description: string;
+    interviewFocus: string;
+  }) => {
     setIsAddingCompany(true);
     
     try {
@@ -159,9 +194,10 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
       const { data, error } = await supabase
         .from('companies')
         .insert({
-          name: companyName.trim(),
-          category: 'enterprise',
-          description: 'Community-added company',
+          name: formData.name.trim(),
+          category: formData.category,
+          description: formData.description.trim() || `${formData.category} company`,
+          interview_focus: formData.interviewFocus.trim() || null,
           added_by: user?.id || null,
         })
         .select()
@@ -177,19 +213,32 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
       } else {
         // Add to local state
         setDatabaseCompanies(prev => [...prev, data]);
-        toast.success(`"${companyName}" added to company database!`);
+        toast.success(`"${formData.name}" added with details!`);
       }
 
-      // Select the company
-      handleSelectCompany(companyName.trim());
+      // Select the company with the provided details
+      const companyDetails: CompanyDetails = {
+        description: formData.description.trim() || undefined,
+        interviewFocus: formData.interviewFocus.trim() || undefined,
+        category: formData.category,
+      };
+      handleSelectCompany(formData.name.trim(), companyDetails);
+      setShowAddDialog(false);
     } catch (err: any) {
       console.error('Error adding company:', err);
       toast.error('Failed to add company. Using it anyway.');
       // Still select the company even if saving failed
-      handleSelectCompany(companyName.trim());
+      const companyDetails: CompanyDetails = {
+        description: formData.description.trim() || undefined,
+        interviewFocus: formData.interviewFocus.trim() || undefined,
+        category: formData.category,
+      };
+      handleSelectCompany(formData.name.trim(), companyDetails);
+      setShowAddDialog(false);
     } finally {
       setIsAddingCompany(false);
       setCustomCompany('');
+      setPendingCompanyName('');
     }
   };
 
@@ -272,7 +321,7 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
                           size="sm" 
                           onClick={() => {
                             const companyName = customCompany || searchQuery;
-                            handleAddCustomCompany(companyName);
+                            handleOpenAddDialog(companyName);
                           }}
                           disabled={isAddingCompany}
                         >
@@ -287,7 +336,7 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
                         </Button>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        This will add the company to our database for everyone to use
+                        Add company details to generate tailored interview questions
                       </p>
                     </div>
                   </CommandEmpty>
@@ -338,7 +387,7 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
                     <CommandGroup heading="Add New Company">
                       <CommandItem
                         value={`add-${searchQuery}`}
-                        onSelect={() => handleAddCustomCompany(searchQuery)}
+                        onSelect={() => handleOpenAddDialog(searchQuery)}
                         className="flex items-center gap-2"
                         disabled={isAddingCompany}
                       >
@@ -348,8 +397,8 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
                           <Plus className="h-4 w-4 text-primary" />
                         )}
                         <div className="flex flex-col">
-                          <span>Add "{searchQuery}" to database</span>
-                          <span className="text-xs text-muted-foreground">Save for everyone to use</span>
+                          <span>Add "{searchQuery}" with details</span>
+                          <span className="text-xs text-muted-foreground">Provide company info for better questions</span>
                         </div>
                       </CommandItem>
                     </CommandGroup>
@@ -412,6 +461,15 @@ export function CompanySelector({ selectedCompany, onSelect }: CompanySelectorPr
           )}
         </CardContent>
       </Card>
+
+      {/* Add Company Dialog */}
+      <AddCompanyDialog
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        initialName={pendingCompanyName}
+        onSubmit={handleAddCompanyWithDetails}
+        isLoading={isAddingCompany}
+      />
     </motion.div>
   );
 }
