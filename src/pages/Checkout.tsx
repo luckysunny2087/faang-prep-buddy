@@ -17,6 +17,7 @@ import {
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { processMockPayment } from "@/lib/payments";
+import { supabase } from "@/integrations/supabase/client";
 
 const Checkout = () => {
     const location = useLocation();
@@ -47,6 +48,26 @@ const Checkout = () => {
         setFormData(prev => ({ ...prev, [id]: value }));
     };
 
+    // Map plan name to plan type for database
+    const getPlanType = (name: string): 'trial' | 'monthly' | 'yearly' => {
+        if (name.toLowerCase().includes('trial')) return 'trial';
+        if (name.toLowerCase().includes('yearly') || name.toLowerCase().includes('elite')) return 'yearly';
+        return 'monthly';
+    };
+
+    // Calculate expiry date based on plan
+    const getExpiryDate = (planType: 'trial' | 'monthly' | 'yearly'): Date => {
+        const now = new Date();
+        switch (planType) {
+            case 'trial':
+                return new Date(now.setDate(now.getDate() + 7)); // 7 days
+            case 'monthly':
+                return new Date(now.setMonth(now.getMonth() + 1)); // 1 month
+            case 'yearly':
+                return new Date(now.setFullYear(now.getFullYear() + 1)); // 1 year
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsProcessing(true);
@@ -55,13 +76,51 @@ const Checkout = () => {
             const result = await processMockPayment(formData);
 
             if (result.success) {
+                // Get current user
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (user) {
+                    const planType = getPlanType(planName);
+                    const expiresAt = getExpiryDate(planType);
+
+                    // Check if user already has a subscription
+                    const { data: existingSub } = await supabase
+                        .from('subscriptions')
+                        .select('id')
+                        .eq('user_id', user.id)
+                        .single();
+
+                    if (existingSub) {
+                        // Update existing subscription
+                        await supabase
+                            .from('subscriptions')
+                            .update({
+                                plan_type: planType,
+                                status: 'active',
+                                started_at: new Date().toISOString(),
+                                expires_at: expiresAt.toISOString(),
+                            })
+                            .eq('user_id', user.id);
+                    } else {
+                        // Create new subscription
+                        await supabase
+                            .from('subscriptions')
+                            .insert({
+                                user_id: user.id,
+                                plan_type: planType,
+                                status: 'active',
+                                expires_at: expiresAt.toISOString(),
+                            });
+                    }
+                }
+
                 setIsSuccess(true);
                 toast.success("Payment successful! Welcome to the Elite club.");
-                // Update user subscription state here in a real app
             } else {
                 toast.error(result.error);
             }
         } catch (error) {
+            console.error('Payment error:', error);
             toast.error("An unexpected error occurred. Please try again.");
         } finally {
             setIsProcessing(false);
