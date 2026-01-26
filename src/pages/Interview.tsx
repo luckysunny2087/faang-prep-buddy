@@ -8,12 +8,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowRight, Loader2, CheckCircle, XCircle, Lightbulb, RefreshCw, AlertCircle, Mic, MicOff, Square } from 'lucide-react';
+import { ArrowRight, Loader2, CheckCircle, XCircle, Lightbulb, RefreshCw, AlertCircle, Mic, Square, Volume2, VolumeX, Pause, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
+import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-
 export default function Interview() {
   const navigate = useNavigate();
   const { currentSession, currentQuestionIndex, addQuestion, addAnswer, nextQuestion, endSession, setIsLoading, isLoading } = useInterview();
@@ -38,6 +38,17 @@ export default function Interview() {
       setUserAnswer(prev => prev + (prev ? ' ' : '') + text);
     }
   });
+
+  // Text-to-speech hook for reading questions aloud
+  const {
+    speak,
+    stop: stopSpeaking,
+    pause: pauseSpeaking,
+    resume: resumeSpeaking,
+    isSpeaking,
+    isPaused,
+    isSupported: isTTSSupported,
+  } = useTextToSpeech({ rate: 0.95 });
 
   // Show voice error as toast
   useEffect(() => {
@@ -306,10 +317,64 @@ export default function Interview() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge>{currentQuestion.type}</Badge>
-                  {currentSession.company && (
-                    <Badge variant="outline">{currentSession.company}</Badge>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Badge>{currentQuestion.type}</Badge>
+                    {currentSession.company && (
+                      <Badge variant="outline">{currentSession.company}</Badge>
+                    )}
+                  </div>
+                  {/* Text-to-Speech Controls */}
+                  {isTTSSupported && (
+                    <div className="flex items-center gap-1">
+                      {isSpeaking ? (
+                        <>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                onClick={isPaused ? resumeSpeaking : pauseSpeaking}
+                                className="h-8 w-8"
+                              >
+                                {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>{isPaused ? 'Resume' : 'Pause'}</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                onClick={stopSpeaking}
+                                className="h-8 w-8"
+                              >
+                                <VolumeX className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Stop reading</TooltipContent>
+                          </Tooltip>
+                        </>
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="outline"
+                              onClick={() => speak(currentQuestion.question)}
+                              className="h-8 w-8"
+                            >
+                              <Volume2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Read question aloud</TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
                   )}
                 </div>
                 <CardTitle className="text-xl leading-relaxed">{currentQuestion.question}</CardTitle>
