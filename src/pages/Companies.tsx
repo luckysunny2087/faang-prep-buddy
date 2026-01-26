@@ -12,42 +12,42 @@ import { Badge } from '@/components/ui/badge';
 
 type FilterCategory = 'all' | CompanyCategory;
 
-const difficultyMap: Record<string, 'Easy' | 'Medium' | 'Hard' | 'Expert'> = {
-  // Big Tech - generally harder
-  amazon: 'Hard', google: 'Expert', meta: 'Hard', apple: 'Hard', netflix: 'Expert', microsoft: 'Medium',
-  salesforce: 'Medium', oracle: 'Medium', adobe: 'Medium', intel: 'Hard', cisco: 'Medium', ibm: 'Medium',
-  // Consulting - MBB are hardest
-  mckinsey: 'Expert', bcg: 'Expert', bain: 'Expert', deloitte: 'Medium', accenture: 'Medium',
-  pwc: 'Medium', ey: 'Medium', kpmg: 'Medium', capgemini: 'Easy', cognizant: 'Easy',
-  // Finance - top banks are hard
-  'goldman-sachs': 'Expert', jpmorgan: 'Hard', 'morgan-stanley': 'Hard', citi: 'Medium',
-  bofa: 'Medium', 'wells-fargo': 'Medium', hsbc: 'Medium', barclays: 'Medium', visa: 'Hard', mastercard: 'Hard',
-  // Indian IT - generally easier
-  tcs: 'Easy', infosys: 'Easy', wipro: 'Easy', hcl: 'Easy', 'tech-mahindra': 'Easy', ltimindtree: 'Easy',
-  // Enterprise - varies
-  sap: 'Medium', servicenow: 'Medium', workday: 'Medium', vmware: 'Medium', splunk: 'Medium',
-  snowflake: 'Hard', databricks: 'Hard', palantir: 'Expert',
-  // Retail - unicorns are harder
-  walmart: 'Medium', target: 'Medium', shopify: 'Hard', ebay: 'Medium', uber: 'Hard',
-  airbnb: 'Hard', doordash: 'Hard', instacart: 'Medium',
-  // Automotive
-  tesla: 'Hard', toyota: 'Medium', ford: 'Medium', gm: 'Medium', bosch: 'Medium', siemens: 'Medium',
+const difficultyMap: Record<string, 'Hard' | 'Expert'> = {
+  // Big Tech - all Hard/Expert
+  amazon: 'Hard', google: 'Expert', meta: 'Hard', apple: 'Hard', netflix: 'Expert', microsoft: 'Hard',
+  salesforce: 'Hard', oracle: 'Hard', adobe: 'Hard', intel: 'Expert', cisco: 'Hard', ibm: 'Hard',
+  // Consulting - MBB are Expert
+  mckinsey: 'Expert', bcg: 'Expert', bain: 'Expert', deloitte: 'Hard', accenture: 'Hard',
+  pwc: 'Hard', ey: 'Hard', kpmg: 'Hard', capgemini: 'Hard', cognizant: 'Hard',
+  // Finance - top banks are Expert
+  'goldman-sachs': 'Expert', jpmorgan: 'Expert', 'morgan-stanley': 'Expert', citi: 'Hard',
+  bofa: 'Hard', 'wells-fargo': 'Hard', hsbc: 'Hard', barclays: 'Hard', visa: 'Expert', mastercard: 'Expert',
+  // Indian IT - all Hard now
+  tcs: 'Hard', infosys: 'Hard', wipro: 'Hard', hcl: 'Hard', 'tech-mahindra': 'Hard', ltimindtree: 'Hard',
+  // Enterprise - all Hard/Expert
+  sap: 'Hard', servicenow: 'Hard', workday: 'Hard', vmware: 'Hard', splunk: 'Hard',
+  snowflake: 'Expert', databricks: 'Expert', palantir: 'Expert',
+  // Retail - all Hard/Expert
+  walmart: 'Hard', target: 'Hard', shopify: 'Expert', ebay: 'Hard', uber: 'Expert',
+  airbnb: 'Expert', doordash: 'Expert', instacart: 'Hard',
+  // Automotive - all Hard/Expert
+  tesla: 'Expert', toyota: 'Hard', ford: 'Hard', gm: 'Hard', bosch: 'Hard', siemens: 'Hard',
+  // Healthcare - all Hard/Expert
+  'johnson-johnson': 'Expert', pfizer: 'Expert', unitedhealth: 'Hard', 'cvs-health': 'Hard',
+  anthem: 'Hard', abbvie: 'Expert', merck: 'Expert', novartis: 'Expert', roche: 'Expert',
+  medtronic: 'Hard', abbott: 'Hard', cigna: 'Hard',
 };
 
-const getDifficulty = (companyId: string): 'Easy' | 'Medium' | 'Hard' | 'Expert' => {
-  return difficultyMap[companyId] || 'Medium';
+const getDifficulty = (companyId: string): 'Hard' | 'Expert' => {
+  return difficultyMap[companyId] || 'Hard';
 };
 
 const getDifficultyStyles = (difficulty: string) => {
   switch (difficulty) {
     case 'Expert':
       return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-    case 'Hard':
+    default: // Hard
       return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
-    case 'Medium':
-      return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
-    default:
-      return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
   }
 };
 
@@ -60,6 +60,7 @@ const getCompanyColor = (category: CompanyCategory) => {
     'enterprise': 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
     'retail': 'bg-pink-500/10 text-pink-600 dark:text-pink-400',
     'automotive': 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
+    'healthcare': 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
   };
   return colors[category] || 'bg-muted text-muted-foreground';
 };

@@ -101,6 +101,50 @@ const companyContextMap: Record<string, CompanyContext> = {
     questionFocus: ['Programming basics', 'Problem-solving', 'Database queries', 'Communication'],
     tips: 'Strong aptitude preparation. Clear communication is valued highly.',
   },
+  
+  // Healthcare & Pharma
+  'johnson-johnson': {
+    name: 'Johnson & Johnson',
+    interviewStyle: 'Credo-based behavioral interviews with technical depth. Values ethical decision-making and patient focus.',
+    cultureValues: ['Patient First', 'Innovation', 'Integrity', 'Collaboration', 'Quality'],
+    questionFocus: ['Regulatory compliance', 'Clinical research methodology', 'Leadership and ethics', 'Cross-functional collaboration'],
+    tips: 'Know the J&J Credo well. Prepare examples of ethical decision-making and patient impact.',
+  },
+  pfizer: {
+    name: 'Pfizer',
+    interviewStyle: 'Science-driven interviews with behavioral components. Values breakthrough thinking and compliance awareness.',
+    cultureValues: ['Courage', 'Excellence', 'Equity', 'Joy'],
+    questionFocus: ['Scientific methodology', 'Drug development lifecycle', 'Regulatory knowledge', 'Data-driven decisions'],
+    tips: 'Understand pharma R&D processes. Show passion for scientific innovation.',
+  },
+  unitedhealth: {
+    name: 'UnitedHealth Group',
+    interviewStyle: 'Data-driven problem solving with healthcare systems focus. Values population health thinking.',
+    cultureValues: ['Integrity', 'Compassion', 'Relationships', 'Innovation', 'Performance'],
+    questionFocus: ['Healthcare analytics', 'System design for health data', 'Member experience', 'Cost optimization'],
+    tips: 'Understand US healthcare system. Prepare examples of data-driven healthcare solutions.',
+  },
+  merck: {
+    name: 'Merck',
+    interviewStyle: 'Research-oriented interviews emphasizing scientific rigor. Values discovery mindset and ethical standards.',
+    cultureValues: ['Patients First', 'Respect', 'Ethics', 'Excellence', 'Innovation'],
+    questionFocus: ['Scientific research', 'Drug discovery process', 'Ethical considerations', 'Collaborative research'],
+    tips: 'Demonstrate scientific curiosity and understanding of pharmaceutical ethics.',
+  },
+  novartis: {
+    name: 'Novartis',
+    interviewStyle: 'Global perspective interviews with innovation focus. Values reimagining medicine and patient outcomes.',
+    cultureValues: ['Innovation', 'Quality', 'Collaboration', 'Performance', 'Courage'],
+    questionFocus: ['Global health perspectives', 'Innovation methodologies', 'Patient outcomes', 'Digital health'],
+    tips: 'Show global healthcare awareness and passion for reimagining medicine.',
+  },
+  medtronic: {
+    name: 'Medtronic',
+    interviewStyle: 'Mission-driven interviews focusing on medical technology impact. Values engineering excellence and patient focus.',
+    cultureValues: ['Mission to alleviate pain', 'Quality', 'Innovation', 'Integrity', 'Contribution'],
+    questionFocus: ['Medical device engineering', 'Regulatory requirements (FDA/CE)', 'Quality systems', 'Patient safety'],
+    tips: 'Know the Medtronic Mission. Prepare examples of engineering impact on patient lives.',
+  },
 };
 
 export function getCompanyContext(companyId: string): CompanyContext | null {
