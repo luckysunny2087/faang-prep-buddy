@@ -70,6 +70,7 @@ export interface InterviewSession {
   level: ExperienceLevel;
   company?: Company;
   companyDetails?: CompanyDetails;
+  timerDuration?: number; // in minutes, null means no timer
   questionTypes: QuestionType[];
   questions: InterviewQuestion[];
   answers: InterviewAnswer[];

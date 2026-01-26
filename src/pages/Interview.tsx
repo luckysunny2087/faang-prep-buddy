@@ -8,12 +8,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowRight, Loader2, CheckCircle, XCircle, Lightbulb, RefreshCw, AlertCircle, Mic, Square, Volume2, VolumeX, Pause, Play } from 'lucide-react';
+import { ArrowRight, Loader2, CheckCircle, XCircle, Lightbulb, RefreshCw, AlertCircle, Mic, Square, Volume2, VolumeX, Pause, Play, Timer, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
+import { useInterviewTimer } from '@/hooks/useInterviewTimer';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 export default function Interview() {
   const navigate = useNavigate();
   const { currentSession, currentQuestionIndex, addQuestion, addAnswer, nextQuestion, endSession, setIsLoading, isLoading } = useInterview();
@@ -49,6 +51,31 @@ export default function Interview() {
     isPaused,
     isSupported: isTTSSupported,
   } = useTextToSpeech({ rate: 0.95 });
+
+  // Interview timer hook
+  const handleTimeUp = () => {
+    toast.warning("Time's up! Your interview session has ended.", {
+      duration: 5000,
+    });
+    // Auto-end the session when time is up
+    saveSessionToDatabase().then(() => {
+      endSession();
+      navigate('/results');
+    });
+  };
+
+  const {
+    formattedTime,
+    percentageRemaining,
+    isTimeUp,
+    isPaused: isTimerPaused,
+    pause: pauseTimer,
+    resume: resumeTimer,
+  } = useInterviewTimer({
+    durationMinutes: currentSession?.timerDuration,
+    onTimeUp: handleTimeUp,
+    autoStart: true,
+  });
 
   // Show voice error as toast
   useEffect(() => {
@@ -301,6 +328,59 @@ export default function Interview() {
   return (
     <Layout showFooter={false}>
       <div className="container py-8 max-w-3xl">
+        {/* Timer Display */}
+        {currentSession.timerDuration && (
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Timer className={cn(
+                  "h-5 w-5",
+                  percentageRemaining <= 10 ? "text-destructive animate-pulse" : 
+                  percentageRemaining <= 25 ? "text-yellow-500" : "text-primary"
+                )} />
+                <span className={cn(
+                  "font-mono text-lg font-bold",
+                  percentageRemaining <= 10 ? "text-destructive" : 
+                  percentageRemaining <= 25 ? "text-yellow-500" : "text-foreground"
+                )}>
+                  {formattedTime}
+                </span>
+                {percentageRemaining <= 25 && (
+                  <Badge variant={percentageRemaining <= 10 ? "destructive" : "secondary"} className="ml-2">
+                    {percentageRemaining <= 10 ? (
+                      <><AlertTriangle className="h-3 w-3 mr-1" /> Low time!</>
+                    ) : (
+                      'Running low'
+                    )}
+                  </Badge>
+                )}
+              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={isTimerPaused ? resumeTimer : pauseTimer}
+                    className="h-8"
+                  >
+                    {isTimerPaused ? <Play className="h-4 w-4 mr-1" /> : <Pause className="h-4 w-4 mr-1" />}
+                    {isTimerPaused ? 'Resume' : 'Pause'}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{isTimerPaused ? 'Resume timer' : 'Pause timer'}</TooltipContent>
+              </Tooltip>
+            </div>
+            <Progress 
+              value={percentageRemaining} 
+              className={cn(
+                "h-2",
+                percentageRemaining <= 10 ? "[&>div]:bg-destructive" : 
+                percentageRemaining <= 25 ? "[&>div]:bg-yellow-500" : ""
+              )} 
+            />
+          </div>
+        )}
+
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-muted-foreground">Question {currentQuestionIndex + 1} of 10</span>

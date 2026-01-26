@@ -5,6 +5,7 @@ import { LevelSelector } from '@/components/practice/LevelSelector';
 import { DomainSelector } from '@/components/practice/DomainSelector';
 import { CompanySelector } from '@/components/practice/CompanySelector';
 import { QuestionTypeSelector } from '@/components/practice/QuestionTypeSelector';
+import { TimerSelector } from '@/components/practice/TimerSelector';
 import { ResumeJobDescriptionInput } from '@/components/practice/ResumeJobDescriptionInput';
 import { CoverLetterGenerator } from '@/components/practice/CoverLetterGenerator';
 import { LearningRoadmap } from '@/components/practice/LearningRoadmap';
@@ -24,12 +25,14 @@ export default function Practice() {
     selectedCompany,
     selectedDomain,
     selectedQuestionTypes,
+    selectedTimerDuration,
     toggleTechnology,
     setSelectedRole,
     setSelectedLevel,
     setSelectedCompany,
     setSelectedDomain,
     setSelectedQuestionTypes,
+    setSelectedTimerDuration,
     startSession,
     jobDescription,
     resumeAnalysis,
@@ -109,6 +112,10 @@ export default function Practice() {
           <QuestionTypeSelector 
             selectedTypes={selectedQuestionTypes} 
             onToggle={handleToggleQuestionType} 
+          />
+          <TimerSelector
+            selectedDuration={selectedTimerDuration}
+            onSelect={setSelectedTimerDuration}
           />
 
           <div className="flex justify-center pt-4">
