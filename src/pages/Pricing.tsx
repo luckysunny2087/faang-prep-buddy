@@ -13,14 +13,15 @@ const plans = [
         id: "trial",
         name: "7-Day Trial",
         price: "0",
-        period: "", // No period for trial
-        description: "Experience the full power of InterviewPrep for one week.",
+        period: "",
+        description: "Test drive our AI-powered interview prep platform.",
         features: [
-            "Unlimited AI-powered feedback",
-            "Access to all FAANG companies",
-            "System Design & Technical tracks",
-            "Basic performance metrics",
-            "Behavioral interview prep"
+            "5 AI mock interviews per day",
+            "Access to 20+ featured companies",
+            "Technical & behavioral questions",
+            "Basic performance feedback",
+            "No timer mode only",
+            "Community Q&A access"
         ],
         buttonText: "Start Free Trial",
         highlight: false,
@@ -33,14 +34,17 @@ const plans = [
         name: "Monthly Pro",
         price: "29",
         period: "/month",
-        description: "The complete preparation suite for high-impact roles.",
+        description: "Full access for serious job seekers ready to land offers.",
         features: [
-            "Everything in Trial",
-            "Priority AI responses",
-            "Advanced skills analytics",
-            "Custom interview tracks",
-            "Mock recruitment experiences",
-            "Offline resources access"
+            "Unlimited AI mock interviews",
+            "All 70+ companies + custom companies",
+            "System design & domain questions",
+            "Timed interview simulations (30/60 min)",
+            "Detailed performance analytics",
+            "Resume & JD tailored questions",
+            "Cover letter generator",
+            "Priority AI response speed",
+            "Interview history & progress tracking"
         ],
         buttonText: "Go Monthly",
         highlight: true,
@@ -51,16 +55,19 @@ const plans = [
     {
         id: "yearly",
         name: "Yearly Elite",
-        price: "290",
+        price: "199",
         period: "/year",
-        description: "Best for long-term career growth and mastery.",
+        description: "Best value for long-term career growth and mastery.",
         features: [
             "Everything in Monthly Pro",
-            "2 Months FREE (Save 17%)",
-            "Personalized learning path",
-            "1-on-1 resume review guide",
+            "Save 43% (vs. monthly billing)",
+            "Personalized learning roadmaps",
+            "AI-powered resume review & tips",
+            "Exclusive expert interview guides",
             "Early access to new features",
-            "Dedicated support channel"
+            "Voice interview practice mode",
+            "Export detailed PDF reports",
+            "Priority email support"
         ],
         buttonText: "Get Yearly Plan",
         highlight: false,
