@@ -8,9 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowRight, Loader2, CheckCircle, XCircle, Lightbulb, RefreshCw, AlertCircle } from 'lucide-react';
+import { ArrowRight, Loader2, CheckCircle, XCircle, Lightbulb, RefreshCw, AlertCircle, Mic, MicOff, Square } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useVoiceInput } from '@/hooks/useVoiceInput';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function Interview() {
   const navigate = useNavigate();
@@ -20,6 +22,29 @@ export default function Interview() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<{ type: 'rate-limit' | 'general'; message: string; action: 'generate' | 'evaluate' } | null>(null);
   const startTimeRef = useRef<Date>(new Date());
+
+  // Voice input hook
+  const { 
+    isListening, 
+    isSupported: isVoiceSupported, 
+    transcript, 
+    error: voiceError, 
+    startListening, 
+    stopListening,
+    resetTranscript 
+  } = useVoiceInput({
+    continuous: true,
+    onFinalTranscript: (text) => {
+      setUserAnswer(prev => prev + (prev ? ' ' : '') + text);
+    }
+  });
+
+  // Show voice error as toast
+  useEffect(() => {
+    if (voiceError) {
+      toast.error(voiceError);
+    }
+  }, [voiceError]);
 
   useEffect(() => {
     if (!currentSession) {
@@ -79,6 +104,11 @@ export default function Interview() {
     const currentQuestion = currentSession.questions[currentQuestionIndex];
     if (!currentQuestion) return;
     
+    // Stop voice input if active
+    if (isListening) {
+      stopListening();
+    }
+    
     setIsLoading(true);
     setError(null);
     try {
@@ -127,6 +157,14 @@ export default function Interview() {
     }
   };
 
+  const handleVoiceToggle = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
   const saveSessionToDatabase = async () => {
     if (!currentSession) return;
     
@@ -141,7 +179,6 @@ export default function Interview() {
       const correctAnswers = currentSession.answers.filter(a => (a.score || 0) >= 7).length;
       const durationMinutes = Math.round((new Date().getTime() - startTimeRef.current.getTime()) / 60000);
 
-      // Save interview session
       await supabase.from('interview_sessions').insert({
         user_id: user.id,
         technology: currentSession.technologies.join(',') || 'general',
@@ -155,7 +192,6 @@ export default function Interview() {
         duration_minutes: durationMinutes,
       });
 
-      // Update profile stats
       const today = new Date().toISOString().split('T')[0];
       const { data: profile } = await supabase
         .from('profiles')
@@ -187,6 +223,7 @@ export default function Interview() {
     setUserAnswer('');
     setFeedback(null);
     setError(null);
+    resetTranscript();
     if (currentQuestionIndex < 9) {
       nextQuestion();
       generateQuestion();
@@ -271,28 +308,75 @@ export default function Interview() {
               <CardHeader>
                 <div className="flex items-center gap-2 mb-2">
                   <Badge>{currentQuestion.type}</Badge>
+                  {currentSession.company && (
+                    <Badge variant="outline">{currentSession.company}</Badge>
+                  )}
                 </div>
                 <CardTitle className="text-xl leading-relaxed">{currentQuestion.question}</CardTitle>
               </CardHeader>
               <CardContent>
-                <Textarea
-                  placeholder="Type your answer here..."
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  className="min-h-[200px]"
-                  disabled={!!feedback || isLoading}
-                />
+                <div className="relative">
+                  <Textarea
+                    placeholder={isListening ? "Listening... speak your answer" : "Type your answer here or use the microphone..."}
+                    value={userAnswer}
+                    onChange={(e) => setUserAnswer(e.target.value)}
+                    className={`min-h-[200px] pr-12 transition-all ${isListening ? 'border-primary ring-2 ring-primary/20' : ''}`}
+                    disabled={!!feedback || isLoading}
+                  />
+                  
+                  {/* Voice input button */}
+                  {isVoiceSupported && !feedback && !isLoading && (
+                    <div className="absolute right-3 top-3">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant={isListening ? "destructive" : "outline"}
+                            onClick={handleVoiceToggle}
+                            className={`h-9 w-9 transition-all ${isListening ? 'animate-pulse' : ''}`}
+                          >
+                            {isListening ? (
+                              <Square className="h-4 w-4" />
+                            ) : (
+                              <Mic className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {isListening ? 'Stop recording' : 'Speak your answer'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Voice status indicator */}
+                {isListening && (
+                  <div className="flex items-center gap-2 mt-2 text-sm text-primary">
+                    <div className="flex items-center gap-1">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                      </span>
+                    </div>
+                    <span>Listening... speak clearly into your microphone</span>
+                  </div>
+                )}
+                
                 {!feedback && (
-                  <Button onClick={submitAnswer} disabled={isLoading || !userAnswer.trim()} className="mt-4">
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Evaluating your answer...
-                      </>
-                    ) : (
-                      'Submit Answer'
-                    )}
-                  </Button>
+                  <div className="flex gap-3 mt-4">
+                    <Button onClick={submitAnswer} disabled={isLoading || !userAnswer.trim()} className="flex-1">
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Evaluating your answer...
+                        </>
+                      ) : (
+                        'Submit Answer'
+                      )}
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>
