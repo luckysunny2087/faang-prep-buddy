@@ -69,6 +69,9 @@ export interface InterviewSession {
   overallScore?: number;
   createdAt: Date;
   completedAt?: Date;
+  // Resume and Job Description context for tailored questions
+  resumeText?: string;
+  jobDescription?: string;
 }
 
 export interface UserProfile {
