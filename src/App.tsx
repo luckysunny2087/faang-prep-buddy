@@ -24,8 +24,8 @@ import Resources from "./pages/Resources";
 import Pricing from "./pages/Pricing";
 import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
-
 import LearningPath from "./pages/LearningPath";
+import InterviewHistory from "./pages/InterviewHistory";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +44,7 @@ const App = () => (
               <Route path="/interview" element={<ProtectedRoute><Interview /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/results" element={<ProtectedRoute><Results /></ProtectedRoute>} />
+              <Route path="/history" element={<ProtectedRoute><InterviewHistory /></ProtectedRoute>} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/companies" element={<Companies />} />
               <Route path="/resources" element={<Resources />} />

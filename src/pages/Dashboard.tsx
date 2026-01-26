@@ -300,7 +300,7 @@ export default function Dashboard() {
                       ))
                     )}
                   </div>
-                  <Button variant="ghost" className="w-full mt-4" size="sm">
+                  <Button variant="ghost" className="w-full mt-4" size="sm" onClick={() => navigate('/history')}>
                     View All Sessions <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </CardContent>
