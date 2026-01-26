@@ -56,6 +56,12 @@ export interface InterviewAnswer {
   improvements?: string[];
 }
 
+export interface CompanyDetails {
+  description?: string;
+  interviewFocus?: string;
+  category?: string;
+}
+
 export interface InterviewSession {
   id: string;
   userId?: string;
@@ -63,6 +69,7 @@ export interface InterviewSession {
   role: Role;
   level: ExperienceLevel;
   company?: Company;
+  companyDetails?: CompanyDetails;
   questionTypes: QuestionType[];
   questions: InterviewQuestion[];
   answers: InterviewAnswer[];
