@@ -203,10 +203,14 @@ ${resumeText || 'No resume provided - assume starting from basics'}
 
 Generate a comprehensive learning roadmap that:
 1. Identifies the top skills gaps in priority order
-2. Provides specific learning resources for each skill
+2. Provides specific learning resources with REAL, WORKING URLs (not placeholder links)
 3. Includes milestones and timeline estimates
 4. Suggests practical projects to demonstrate skills
 5. Recommends certifications where applicable
+6. Includes relevant podcasts with real links (Spotify, Apple Podcasts, or YouTube)
+7. Includes curated reference websites and blogs with real URLs
+
+IMPORTANT: All URLs must be real, working links. For resources, use actual course/article URLs from platforms like Coursera, Udemy, freeCodeCamp, MDN, etc. For podcasts, use real podcast links from Spotify or Apple Podcasts.
 
 Return ONLY valid JSON in this exact format:
 {
@@ -221,7 +225,13 @@ Return ONLY valid JSON in this exact format:
       "targetLevel": "intermediate" | "advanced" | "expert",
       "timeToLearn": "X weeks/months",
       "resources": [
-        { "type": "course" | "book" | "tutorial" | "practice", "name": "Resource name", "url": "optional url or platform", "isFree": true/false }
+        { "type": "course" | "article" | "tutorial" | "documentation", "name": "Resource name", "url": "https://real-url.com", "isFree": true/false }
+      ],
+      "podcasts": [
+        { "name": "Podcast Name", "episode": "Relevant episode or topic", "url": "https://open.spotify.com/show/..." }
+      ],
+      "websites": [
+        { "name": "Site Name", "description": "Why it's useful for this skill", "url": "https://real-site.com" }
       ],
       "practiceProjects": ["Project idea 1", "Project idea 2"],
       "certifications": ["Certification name if applicable"]
@@ -244,7 +254,7 @@ Return ONLY valid JSON in this exact format:
             { role: "user", content: userPrompt }
           ],
           temperature: 0.7,
-          max_tokens: 4000,
+          max_tokens: 5000,
         }),
       });
 
