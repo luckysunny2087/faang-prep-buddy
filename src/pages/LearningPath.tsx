@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Brain, Sparkles, Loader2, ChevronRight, BookOpen, Target, GraduationCap, Download } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -31,6 +32,7 @@ const LearningPath = () => {
     const [targetCompany, setTargetCompany] = useState("");
     const [timeline, setTimeline] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
     const [pathData, setPathData] = useState<LearningPathData | null>(null);
 
     const generatePath = async () => {
@@ -283,7 +285,7 @@ const LearningPath = () => {
                                                 </div>
                                             </CardContent>
                                             <CardFooter className="pt-4 mt-auto">
-                                                <Button variant="ghost" className="w-full text-xs h-8 justify-between hover:bg-primary/5 hover:text-primary">
+                                                <Button variant="ghost" className="w-full text-xs h-8 justify-between hover:bg-primary/5 hover:text-primary" onClick={() => navigate(`/resources?search=${encodeURIComponent(stage.title)}`)}>
                                                     Explore Resources
                                                     <ChevronRight className="h-3.5 w-3.5" />
                                                 </Button>
@@ -301,7 +303,7 @@ const LearningPath = () => {
                                     for the topics you've just discovered.
                                 </p>
                                 <div className="flex gap-4 justify-center">
-                                    <Button size="lg" onClick={() => window.location.href = '/practice'}>Start AI Interview</Button>
+                                    <Button size="lg" onClick={() => navigate('/practice')}>Start AI Interview</Button>
                                     <Button size="lg" variant="outline" onClick={downloadPDF}>
                                         <Download className="mr-2 h-5 w-5" />
                                         Save Path as PDF
