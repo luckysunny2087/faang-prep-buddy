@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { processMockPayment } from "@/lib/payments";
 import { supabase } from "@/integrations/supabase/client";
+import CheckoutUpsell from "@/components/checkout/CheckoutUpsell";
 
 const Checkout = () => {
     const location = useLocation();
@@ -210,8 +211,11 @@ const Checkout = () => {
                                             <ShieldCheck className="h-4 w-4 text-green-500" />
                                             <span>30-day money-back guarantee</span>
                                         </div>
-                                    </CardFooter>
+                                </CardFooter>
                                 </Card>
+
+                                {/* Upsell to Elite */}
+                                <CheckoutUpsell currentPlan={planName} />
                             </motion.div>
                         </div>
 

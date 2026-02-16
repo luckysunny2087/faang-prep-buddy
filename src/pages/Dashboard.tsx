@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useSubscription } from "@/hooks/useSubscription";
+import UpgradeBanner from "@/components/UpgradeBanner";
 import {
   Target,
   TrendingUp,
@@ -53,7 +55,7 @@ const achievements = [
 export default function Dashboard() {
   const navigate = useNavigate();
   const { loading, stats, recentSessions, skillsData, performanceData, companyReadiness } = useDashboardData();
-
+  const { subscription } = useSubscription();
   const displaySkills = skillsData.length > 0 ? skillsData : defaultSkillsData;
 
   // Calculate achievement status
@@ -93,6 +95,9 @@ export default function Dashboard() {
               Track your interview preparation journey
             </p>
           </motion.div>
+
+          {/* Upgrade Banner */}
+          <UpgradeBanner currentPlan={subscription?.plan_type} variant="dashboard" />
 
           {/* Stats Grid */}
           <motion.div
