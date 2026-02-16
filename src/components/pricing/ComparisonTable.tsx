@@ -5,32 +5,32 @@ type FeatureValue = boolean | string;
 
 interface Feature {
   name: string;
-  trial: FeatureValue;
-  monthly: FeatureValue;
-  yearly: FeatureValue;
+  basic: FeatureValue;
+  pro: FeatureValue;
+  elite: FeatureValue;
 }
 
 const features: Feature[] = [
-  { name: "AI Mock Interviews", trial: "5/day", monthly: "Unlimited", yearly: "Unlimited" },
-  { name: "Featured Companies", trial: "20+", monthly: "70+", yearly: "70+" },
-  { name: "Custom Companies", trial: false, monthly: true, yearly: true },
-  { name: "Technical Questions", trial: true, monthly: true, yearly: true },
-  { name: "Behavioral Questions", trial: true, monthly: true, yearly: true },
-  { name: "System Design Questions", trial: false, monthly: true, yearly: true },
-  { name: "Domain-Specific Questions", trial: false, monthly: true, yearly: true },
-  { name: "Timed Simulations (30/60 min)", trial: false, monthly: true, yearly: true },
-  { name: "Performance Analytics", trial: "Basic", monthly: "Detailed", yearly: "Detailed" },
-  { name: "Resume & JD Tailored Questions", trial: false, monthly: true, yearly: true },
-  { name: "Cover Letter Generator", trial: false, monthly: true, yearly: true },
-  { name: "Interview History & Tracking", trial: false, monthly: true, yearly: true },
-  { name: "Priority AI Response Speed", trial: false, monthly: true, yearly: true },
-  { name: "Personalized Learning Roadmaps", trial: false, monthly: false, yearly: true },
-  { name: "AI Resume Review & Tips", trial: false, monthly: false, yearly: true },
-  { name: "Voice Interview Practice", trial: false, monthly: false, yearly: true },
-  { name: "Export PDF Reports", trial: false, monthly: false, yearly: true },
-  { name: "Expert Interview Guides", trial: false, monthly: false, yearly: true },
-  { name: "Early Access to New Features", trial: false, monthly: false, yearly: true },
-  { name: "Priority Email Support", trial: false, monthly: false, yearly: true },
+  { name: "AI Mock Interviews", basic: "5/day", pro: "Unlimited", elite: "Unlimited" },
+  { name: "Featured Companies", basic: "20+", pro: "70+", elite: "70+" },
+  { name: "Custom Companies", basic: false, pro: true, elite: true },
+  { name: "Technical Questions", basic: true, pro: true, elite: true },
+  { name: "Behavioral Questions", basic: true, pro: true, elite: true },
+  { name: "System Design Questions", basic: false, pro: true, elite: true },
+  { name: "Domain-Specific Questions", basic: false, pro: true, elite: true },
+  { name: "Timed Simulations (30/60 min)", basic: false, pro: true, elite: true },
+  { name: "Performance Analytics", basic: "Basic", pro: "Detailed", elite: "Detailed" },
+  { name: "Resume & JD Tailored Questions", basic: false, pro: true, elite: true },
+  { name: "Cover Letter Generator", basic: false, pro: true, elite: true },
+  { name: "Interview History & Tracking", basic: false, pro: true, elite: true },
+  { name: "Priority AI Response Speed", basic: false, pro: true, elite: true },
+  { name: "Personalized Learning Roadmaps", basic: false, pro: false, elite: true },
+  { name: "AI Resume Review & Tips", basic: false, pro: false, elite: true },
+  { name: "Voice Interview Practice", basic: false, pro: false, elite: true },
+  { name: "Export PDF Reports", basic: false, pro: false, elite: true },
+  { name: "Expert Interview Guides", basic: false, pro: false, elite: true },
+  { name: "Early Access to New Features", basic: false, pro: false, elite: true },
+  { name: "Priority Email Support", basic: false, pro: false, elite: true },
 ];
 
 const renderValue = (value: FeatureValue) => {
@@ -58,9 +58,9 @@ const ComparisonTable = () => (
           {features.map((feature) => (
             <TableRow key={feature.name} className="hover:bg-muted/20">
               <TableCell className="text-sm text-foreground/80">{feature.name}</TableCell>
-              <TableCell className="text-center">{renderValue(feature.trial)}</TableCell>
-              <TableCell className="text-center bg-primary/[0.03]">{renderValue(feature.monthly)}</TableCell>
-              <TableCell className="text-center">{renderValue(feature.yearly)}</TableCell>
+              <TableCell className="text-center">{renderValue(feature.basic)}</TableCell>
+              <TableCell className="text-center bg-primary/[0.03]">{renderValue(feature.pro)}</TableCell>
+              <TableCell className="text-center">{renderValue(feature.elite)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

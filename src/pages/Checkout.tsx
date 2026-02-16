@@ -49,21 +49,21 @@ const Checkout = () => {
     };
 
     // Map plan name to plan type for database
-    const getPlanType = (name: string): 'trial' | 'monthly' | 'yearly' => {
-        if (name.toLowerCase().includes('trial')) return 'trial';
-        if (name.toLowerCase().includes('yearly') || name.toLowerCase().includes('elite')) return 'yearly';
-        return 'monthly';
+    const getPlanType = (name: string): 'basic' | 'pro' | 'elite' => {
+        if (name.toLowerCase().includes('basic')) return 'basic';
+        if (name.toLowerCase().includes('elite')) return 'elite';
+        return 'pro';
     };
 
     // Calculate expiry date based on plan
-    const getExpiryDate = (planType: 'trial' | 'monthly' | 'yearly'): Date => {
+    const getExpiryDate = (planType: 'basic' | 'pro' | 'elite'): Date => {
         const now = new Date();
         switch (planType) {
-            case 'trial':
+            case 'basic':
                 return new Date(now.setDate(now.getDate() + 7)); // 7 days
-            case 'monthly':
+            case 'pro':
                 return new Date(now.setMonth(now.getMonth() + 1)); // 1 month
-            case 'yearly':
+            case 'elite':
                 return new Date(now.setFullYear(now.getFullYear() + 1)); // 1 year
         }
     };

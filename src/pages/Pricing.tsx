@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 const plans = [
     {
-        id: "trial",
+        id: "basic",
         name: "Basic",
         price: "0",
         period: "/7 days",
@@ -33,7 +33,7 @@ const plans = [
         bg: "bg-blue-500/10"
     },
     {
-        id: "monthly",
+        id: "pro",
         name: "Pro",
         price: "14.99",
         period: "/month",
@@ -56,7 +56,7 @@ const plans = [
         bg: "bg-orange-500/10"
     },
     {
-        id: "yearly",
+        id: "elite",
         name: "Elite",
         price: "19.99",
         period: "/month",
