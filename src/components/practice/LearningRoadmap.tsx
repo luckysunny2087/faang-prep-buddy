@@ -157,7 +157,7 @@ export function LearningRoadmap() {
           <div className="text-center py-6">
             <Lock className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
             <p className="text-muted-foreground mb-4">
-              Upgrade to Monthly Pro or Yearly Elite to unlock personalized learning roadmaps
+              Upgrade to Pro or Elite to unlock personalized learning roadmaps
             </p>
             <Button onClick={() => navigate('/pricing')} className="gap-2">
               <Sparkles className="h-4 w-4" />

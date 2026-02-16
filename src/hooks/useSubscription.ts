@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface Subscription {
   id: string;
   user_id: string;
-  plan_type: 'trial' | 'monthly' | 'yearly';
+  plan_type: 'basic' | 'pro' | 'elite';
   status: 'active' | 'cancelled' | 'expired';
   started_at: string;
   expires_at: string | null;
@@ -40,8 +40,8 @@ export function useSubscription() {
           const isExpired = data.expires_at && new Date(data.expires_at) < new Date();
           if (!isExpired) {
             setSubscription(data as Subscription);
-            // Monthly and yearly are premium, trial can access some features
-            setIsPremium(data.plan_type === 'monthly' || data.plan_type === 'yearly');
+            // Pro and Elite are premium, Basic can access some features
+            setIsPremium(data.plan_type === 'pro' || data.plan_type === 'elite');
           }
         }
       } catch (err) {
