@@ -1,34 +1,46 @@
 
 
-# Fix: "Explore Resources" Button Not Navigating
+# Fix: Connect Learning Path "Explore Resources" to Actual Resources
 
 ## Problem
-The "Explore Resources" button in each Learning Path stage card has no `onClick` handler attached. It renders as a ghost button but does nothing when clicked.
+Two issues prevent the button from working:
+1. The Resources page never reads the `search` query parameter from the URL -- it only reads `filter`. So even with a perfect search term, the search box stays empty.
+2. The navigation sends the full stage title (e.g. "Executive Communication & Case Mastery") which is too specific to match any curated resource names like "LeetCode" or "System Design Primer". The search should use individual **topics** from the stage instead.
 
 ## Solution
-Wire up the button to navigate users to the Resources page with a pre-filled search query matching the stage title/topics.
 
----
+### 1. Resources Page: Read `search` from URL (`src/pages/Resources.tsx`)
+Add logic in the existing `useEffect` to read the `search` query parameter and populate the search input:
+
+```typescript
+useEffect(() => {
+  const filter = searchParams.get('filter');
+  if (filter === 'completed' || filter === 'saved_for_later') {
+    setStatusFilter(filter);
+  }
+  const search = searchParams.get('search');
+  if (search) {
+    setSearchQuery(search);
+  }
+}, [searchParams]);
+```
+
+### 2. Learning Path: Send the first topic instead of full title (`src/pages/LearningPath.tsx`)
+Change the navigate call to use the first topic from the stage (which is more likely to match a resource category like "System Design" or "Algorithms") instead of the verbose stage title:
+
+```typescript
+onClick={() => navigate(`/resources?search=${encodeURIComponent(stage.topics[0] || stage.title)}`)}
+```
 
 ## Technical Details
 
-### File to Modify: `src/pages/LearningPath.tsx`
+### Files to Modify
 
-1. **Add `useNavigate`** import from `react-router-dom`
-2. **Initialize the hook** inside the component: `const navigate = useNavigate()`
-3. **Add `onClick` to the "Explore Resources" button** that navigates to `/resources?search={stage.title}`:
+**`src/pages/Resources.tsx`** (1 change)
+- In the `useEffect` (around line 87-92), add reading of the `search` query param to initialize `searchQuery` state
 
-```typescript
-<Button
-  variant="ghost"
-  className="w-full text-xs h-8 justify-between hover:bg-primary/5 hover:text-primary"
-  onClick={() => navigate(`/resources?search=${encodeURIComponent(stage.title)}`)}
->
-  Explore Resources
-  <ChevronRight className="h-3.5 w-3.5" />
-</Button>
-```
-
-4. **Also fix the "Start AI Interview" button** (line 304) which currently uses `window.location.href` instead of React Router navigation -- replace with `navigate('/practice')` for a smoother SPA transition.
+**`src/pages/LearningPath.tsx`** (1 change)  
+- On line 288, change `stage.title` to `stage.topics[0] || stage.title` so the search term is a concrete topic keyword rather than a long descriptive title
 
 ### No other files need changes.
+
