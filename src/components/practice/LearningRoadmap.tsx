@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useInterview } from '@/contexts/InterviewContext';
@@ -23,10 +22,25 @@ import {
   Crown,
   Lightbulb,
   Zap,
+  Headphones,
+  Globe,
+  Search,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+
+interface RoadmapPodcast {
+  name: string;
+  episode: string;
+  url: string;
+}
+
+interface RoadmapWebsite {
+  name: string;
+  description: string;
+  url: string;
+}
 
 interface RoadmapSkill {
   skill: string;
@@ -41,6 +55,8 @@ interface RoadmapSkill {
     url?: string;
     isFree: boolean;
   }>;
+  podcasts?: RoadmapPodcast[];
+  websites?: RoadmapWebsite[];
   practiceProjects: string[];
   certifications: string[];
 }
@@ -55,12 +71,14 @@ interface LearningRoadmapResult {
 
 export function LearningRoadmap() {
   const { resumeText, jobDescription, selectedCompany, selectedLevel } = useInterview();
-  const { isPremium, isLoading: subLoading } = useSubscription();
+  const { isPremium, subscription, isLoading: subLoading } = useSubscription();
   const [isGenerating, setIsGenerating] = useState(false);
   const [roadmap, setRoadmap] = useState<LearningRoadmapResult | null>(null);
   const [isCareerSwitch, setIsCareerSwitch] = useState(false);
   const [expandedSkills, setExpandedSkills] = useState<Set<number>>(new Set());
   const navigate = useNavigate();
+
+  const isElite = subscription?.plan_type === 'elite';
 
   const generateRoadmap = async () => {
     if (!jobDescription.trim()) {
@@ -100,6 +118,15 @@ export function LearningRoadmap() {
   };
 
   const toggleSkillExpanded = (index: number) => {
+    if (!isElite) {
+      toast.info('Upgrade to Elite to explore detailed resources, podcasts, and websites.', {
+        action: {
+          label: 'Upgrade',
+          onClick: () => navigate('/pricing'),
+        },
+      });
+      return;
+    }
     setExpandedSkills(prev => {
       const next = new Set(prev);
       if (next.has(index)) {
@@ -127,6 +154,9 @@ export function LearningRoadmap() {
     if (priority <= 4) return 'bg-orange-500';
     return 'bg-yellow-500';
   };
+
+  const ensureUrl = (url: string) =>
+    url.startsWith('http') ? url : `https://${url}`;
 
   if (subLoading) {
     return (
@@ -291,11 +321,18 @@ export function LearningRoadmap() {
                           </CardDescription>
                         </div>
                       </div>
-                      <Badge variant="outline">{expandedSkills.has(index) ? 'Less' : 'More'}</Badge>
+                      {isElite ? (
+                        <Badge variant="outline">{expandedSkills.has(index) ? 'Less' : 'More'}</Badge>
+                      ) : (
+                        <Badge variant="outline" className="gap-1 text-muted-foreground">
+                          <Lock className="h-3 w-3" />
+                          Elite
+                        </Badge>
+                      )}
                     </div>
                   </CardHeader>
                   
-                  {expandedSkills.has(index) && (
+                  {expandedSkills.has(index) && isElite && (
                     <CardContent className="pt-0 space-y-4">
                       <p className="text-sm text-muted-foreground">{skill.importance}</p>
                       
@@ -316,11 +353,61 @@ export function LearningRoadmap() {
                                 <div className="flex items-center gap-2">
                                   {resource.isFree && <Badge variant="secondary" className="text-xs">Free</Badge>}
                                   {resource.url && (
-                                    <a href={resource.url.startsWith('http') ? resource.url : `https://${resource.url}`} target="_blank" rel="noopener noreferrer">
+                                    <a href={ensureUrl(resource.url)} target="_blank" rel="noopener noreferrer">
                                       <ExternalLink className="h-4 w-4 text-primary" />
                                     </a>
                                   )}
                                 </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Podcasts */}
+                      {skill.podcasts && skill.podcasts.length > 0 && (
+                        <div>
+                          <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                            <Headphones className="h-4 w-4 text-purple-500" />
+                            Recommended Podcasts
+                          </p>
+                          <div className="space-y-2">
+                            {skill.podcasts.map((podcast, pi) => (
+                              <div key={pi} className="flex items-center justify-between text-sm p-2 bg-purple-500/5 rounded border border-purple-500/10">
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium truncate">{podcast.name}</p>
+                                  <p className="text-xs text-muted-foreground truncate">{podcast.episode}</p>
+                                </div>
+                                {podcast.url && (
+                                  <a href={ensureUrl(podcast.url)} target="_blank" rel="noopener noreferrer" className="ml-2 shrink-0">
+                                    <ExternalLink className="h-4 w-4 text-purple-500" />
+                                  </a>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Websites */}
+                      {skill.websites && skill.websites.length > 0 && (
+                        <div>
+                          <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                            <Globe className="h-4 w-4 text-blue-500" />
+                            Useful Websites
+                          </p>
+                          <div className="space-y-2">
+                            {skill.websites.map((site, si) => (
+                              <div key={si} className="flex items-center justify-between text-sm p-2 bg-blue-500/5 rounded border border-blue-500/10">
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium truncate">{site.name}</p>
+                                  <p className="text-xs text-muted-foreground truncate">{site.description}</p>
+                                </div>
+                                {site.url && (
+                                  <a href={ensureUrl(site.url)} target="_blank" rel="noopener noreferrer" className="ml-2 shrink-0">
+                                    <ExternalLink className="h-4 w-4 text-blue-500" />
+                                  </a>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -356,6 +443,20 @@ export function LearningRoadmap() {
                           </div>
                         </div>
                       )}
+
+                      {/* Explore in Resources Hub */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5 w-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/resources?search=${encodeURIComponent(skill.skill)}`);
+                        }}
+                      >
+                        <Search className="h-3.5 w-3.5" />
+                        Explore in Resources Hub
+                      </Button>
                     </CardContent>
                   )}
                 </Card>
