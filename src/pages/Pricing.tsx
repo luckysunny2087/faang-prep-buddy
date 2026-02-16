@@ -14,9 +14,9 @@ import { useNavigate } from "react-router-dom";
 const plans = [
     {
         id: "trial",
-        name: "7-Day Trial",
+        name: "Basic",
         price: "0",
-        period: "",
+        period: "/7 days",
         description: "Test drive our AI-powered interview prep platform.",
         features: [
             "5 AI mock interviews per day",
@@ -34,8 +34,8 @@ const plans = [
     },
     {
         id: "monthly",
-        name: "Monthly Pro",
-        price: "29",
+        name: "Pro",
+        price: "14.99",
         period: "/month",
         description: "Full access for serious job seekers ready to land offers.",
         features: [
@@ -49,7 +49,7 @@ const plans = [
             "Priority AI response speed",
             "Interview history & progress tracking"
         ],
-        buttonText: "Go Monthly",
+        buttonText: "Go Pro",
         highlight: true,
         icon: Flame,
         color: "text-orange-500",
@@ -57,13 +57,12 @@ const plans = [
     },
     {
         id: "yearly",
-        name: "Yearly Elite",
-        price: "199",
-        period: "/year",
+        name: "Elite",
+        price: "19.99",
+        period: "/month",
         description: "Best value for long-term career growth and mastery.",
         features: [
-            "Everything in Monthly Pro",
-            "Save 43% (vs. monthly billing)",
+            "Everything in Pro",
             "Personalized learning roadmaps",
             "AI-powered resume review & tips",
             "Exclusive expert interview guides",
@@ -72,7 +71,7 @@ const plans = [
             "Export detailed PDF reports",
             "Priority email support"
         ],
-        buttonText: "Get Yearly Plan",
+        buttonText: "Go Elite",
         highlight: false,
         icon: Star,
         color: "text-purple-500",

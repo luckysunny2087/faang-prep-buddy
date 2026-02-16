@@ -49,9 +49,9 @@ const ComparisonTable = () => (
         <TableHeader>
           <TableRow className="bg-muted/30">
             <TableHead className="w-[40%] font-semibold text-foreground">Feature</TableHead>
-            <TableHead className="text-center font-semibold text-foreground">Trial</TableHead>
-            <TableHead className="text-center font-semibold text-primary">Monthly Pro</TableHead>
-            <TableHead className="text-center font-semibold text-foreground">Yearly Elite</TableHead>
+            <TableHead className="text-center font-semibold text-foreground">Basic</TableHead>
+            <TableHead className="text-center font-semibold text-primary">Pro</TableHead>
+            <TableHead className="text-center font-semibold text-foreground">Elite</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

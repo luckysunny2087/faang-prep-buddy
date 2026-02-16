@@ -15,15 +15,15 @@ const PlanSwitcher = ({ value, onChange }: PlanSwitcherProps) => (
         </TabsTrigger>
         <TabsTrigger value="trial" className="px-5 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
           <Rocket className="h-4 w-4 text-blue-500" />
-          Trial
+          Basic
         </TabsTrigger>
         <TabsTrigger value="monthly" className="px-5 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
           <Flame className="h-4 w-4 text-orange-500" />
-          Monthly
+          Pro
         </TabsTrigger>
         <TabsTrigger value="yearly" className="px-5 gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
           <Star className="h-4 w-4 text-purple-500" />
-          Yearly
+          Elite
         </TabsTrigger>
       </TabsList>
     </Tabs>
