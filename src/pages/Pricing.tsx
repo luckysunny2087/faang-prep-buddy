@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Flame, Star, Rocket, ShieldCheck } from "lucide-react";
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import ComparisonTable from "@/components/pricing/ComparisonTable";
 
 import { useNavigate } from "react-router-dom";
 
@@ -181,6 +181,9 @@ const Pricing = () => {
                         <ShieldCheck className="h-5 w-5" />
                         <span>Secure payment processing via Stripe. Cancel anytime.</span>
                     </div>
+
+                    {/* Comparison Table */}
+                    <ComparisonTable />
 
                     {/* FAQ Mini Section */}
                     <div className="mt-24 max-w-3xl mx-auto text-center">
