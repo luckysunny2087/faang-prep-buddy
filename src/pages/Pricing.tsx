@@ -9,6 +9,8 @@ import ComparisonTable from "@/components/pricing/ComparisonTable";
 import PlanSwitcher from "@/components/pricing/PlanSwitcher";
 import PricingFAQ from "@/components/pricing/PricingFAQ";
 import PricingChat from "@/components/pricing/PricingChat";
+import UpgradeBanner from "@/components/UpgradeBanner";
+import { useSubscription } from "@/hooks/useSubscription";
 import { useNavigate } from "react-router-dom";
 
 const plans = [
@@ -82,7 +84,7 @@ const plans = [
 const Pricing = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("all");
-
+    const { subscription } = useSubscription();
     const filteredPlans = activeTab === "all" ? plans : plans.filter(p => p.id === activeTab);
 
     const handlePlanSelection = (plan: typeof plans[0]) => {
@@ -118,6 +120,11 @@ const Pricing = () => {
                         </motion.div>
                     </div>
 
+                    {/* Upgrade Banner for logged-in users */}
+                    {subscription && (
+                        <UpgradeBanner currentPlan={subscription.plan_type} variant="pricing" />
+                    )}
+
                     {/* Plan Switcher */}
                     <PlanSwitcher value={activeTab} onChange={setActiveTab} />
 
@@ -150,6 +157,13 @@ const Pricing = () => {
                                         <div className="mb-8">
                                             <span className="text-4xl font-bold">${plan.price}</span>
                                             {plan.period && <span className="text-muted-foreground">{plan.period}</span>}
+                                            {plan.id === "elite" && (
+                                                <div className="mt-2">
+                                                    <Badge variant="secondary" className="text-xs bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
+                                                        Save $60/year vs Pro
+                                                    </Badge>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="space-y-4">
                                             <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">What's included:</p>
