@@ -89,6 +89,10 @@ const Resources = () => {
     if (filter === 'completed' || filter === 'saved_for_later') {
       setStatusFilter(filter);
     }
+    const search = searchParams.get('search');
+    if (search) {
+      setSearchQuery(search);
+    }
   }, [searchParams]);
 
   const filteredCategories = categories
