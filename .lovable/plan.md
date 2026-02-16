@@ -1,46 +1,23 @@
 
 
-# Fix: Connect Learning Path "Explore Resources" to Actual Resources
+# Rebrand "InterviewPrep" to "PrepGenius" Across the App
 
 ## Problem
-Two issues prevent the button from working:
-1. The Resources page never reads the `search` query parameter from the URL -- it only reads `filter`. So even with a perfect search term, the search box stays empty.
-2. The navigation sends the full stage title (e.g. "Executive Communication & Case Mastery") which is too specific to match any curated resource names like "LeetCode" or "System Design Primer". The search should use individual **topics** from the stage instead.
+The Auth (Sign In/Sign Up) page and several other files still show the old "InterviewPrep" branding instead of "PrepGenius".
 
-## Solution
+## Changes
 
-### 1. Resources Page: Read `search` from URL (`src/pages/Resources.tsx`)
-Add logic in the existing `useEffect` to read the `search` query parameter and populate the search input:
+### 1. `src/pages/Auth.tsx`
+- Change logo initials from `IP` to `PG`
+- Change brand name from `InterviewPrep` to `PrepGenius`
+- Change signup success toast from `"Welcome to InterviewPrep."` to `"Welcome to PrepGenius."`
 
-```typescript
-useEffect(() => {
-  const filter = searchParams.get('filter');
-  if (filter === 'completed' || filter === 'saved_for_later') {
-    setStatusFilter(filter);
-  }
-  const search = searchParams.get('search');
-  if (search) {
-    setSearchQuery(search);
-  }
-}, [searchParams]);
-```
+### 2. `src/components/FAQAssistant.tsx`
+- Change default assistant greeting from `"I'm your InterviewPrep assistant"` to `"I'm your PrepGenius assistant"`
+- Change card title from `"InterviewPrep Assistant"` to `"PrepGenius Assistant"`
 
-### 2. Learning Path: Send the first topic instead of full title (`src/pages/LearningPath.tsx`)
-Change the navigate call to use the first topic from the stage (which is more likely to match a resource category like "System Design" or "Algorithms") instead of the verbose stage title:
+### 3. `supabase/functions/interview-ai/index.ts`
+- Change AI system prompt references from `"InterviewPrep"` to `"PrepGenius"` (two occurrences in the FAQ assistant prompt)
 
-```typescript
-onClick={() => navigate(`/resources?search=${encodeURIComponent(stage.topics[0] || stage.title)}`)}
-```
-
-## Technical Details
-
-### Files to Modify
-
-**`src/pages/Resources.tsx`** (1 change)
-- In the `useEffect` (around line 87-92), add reading of the `search` query param to initialize `searchQuery` state
-
-**`src/pages/LearningPath.tsx`** (1 change)  
-- On line 288, change `stage.title` to `stage.topics[0] || stage.title` so the search term is a concrete topic keyword rather than a long descriptive title
-
-### No other files need changes.
+These are the only files where "InterviewPrep" appears as a **brand name**. Other files use phrases like "interview prep" or "interview preparation" as descriptive text (e.g., "coding interview prep", "AI-powered interview prep platform"), which are correct as-is and do not need changing.
 
