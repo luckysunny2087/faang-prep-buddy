@@ -342,10 +342,10 @@ Return JSON only: {"score": 1-10, "feedback": "2-3 sentences of specific feedbac
       Respond ONLY with valid JSON.
       Format: {"title": "The Master Roadmap", "description": "High-level strategy", "stages": [{"title": "Stage 1", "description": "Why this matters", "topics": ["topic 1", "topic 2"]}]}`;
     } else if (action === 'ask-faq') {
-      systemPrompt = `You are the InterviewPrep AI Support Assistant. 
+      systemPrompt = `You are the PrepGenius AI Support Assistant. 
       Help users understand how this platform works.
       
-      Platform: InterviewPrep - AI-powered interview practice with real-time feedback
+      Platform: PrepGenius - AI-powered interview practice with real-time feedback
       Key Features: Technical/behavioral/system design questions, company-specific tracks (70+ companies), progress tracking
       
       Respond in a conversational but professional tone. Keep answers concise (1-3 sentences).

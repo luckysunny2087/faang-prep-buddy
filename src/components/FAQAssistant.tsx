@@ -18,7 +18,7 @@ export function FAQAssistant() {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        { role: 'assistant', content: 'Hi! I\'m your InterviewPrep assistant. How can I help you today?' }
+        { role: 'assistant', content: 'Hi! I\'m your PrepGenius assistant. How can I help you today?' }
     ]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -84,7 +84,7 @@ export function FAQAssistant() {
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 bg-primary text-primary-foreground rounded-t-xl">
                                 <CardTitle className="text-sm font-bold flex items-center gap-2">
                                     <Bot className="h-5 w-5" />
-                                    InterviewPrep Assistant
+                                    PrepGenius Assistant
                                 </CardTitle>
                                 <Button
                                     variant="ghost"

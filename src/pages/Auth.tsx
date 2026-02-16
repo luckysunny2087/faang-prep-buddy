@@ -115,7 +115,7 @@ export default function Auth() {
         toast.error(error.message);
       }
     } else {
-      toast.success('Account created! Welcome to InterviewPrep.');
+      toast.success('Account created! Welcome to PrepGenius.');
     }
     setIsLoading(false);
   };
@@ -126,9 +126,9 @@ export default function Auth() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-display font-bold text-xl">
-              IP
+              PG
             </div>
-            <span className="font-display font-semibold text-2xl">InterviewPrep</span>
+            <span className="font-display font-semibold text-2xl">PrepGenius</span>
           </div>
           <p className="text-muted-foreground">Master your tech interviews with AI-powered practice</p>
         </div>
