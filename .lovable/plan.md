@@ -1,89 +1,80 @@
 
 
-# Resource Tracking: Mark as Completed, Save for Later, and My Study Hub
+# Enhanced Learning Roadmap: Explore Resources, Podcasts, and Elite Gating
 
 ## Overview
-Add the ability for logged-in users to mark resources as "Completed" or "Save for Later" directly from the Resources page. All tracked resources will be accessible from a dedicated section called **"My Study Hub"** on the Dashboard page.
+Enhance the AI-generated Learning Roadmap to include richer, more actionable resources -- real article links, recommended websites, and podcast suggestions for each skill. The detailed "Explore Resources" section within each roadmap skill will be gated to **Elite members only**, while Pro members can still generate the roadmap overview.
 
-## What You'll Get
+## What Changes
 
-### On the Resources Page
-- Each resource card gets two small action buttons:
-  - **Checkmark** -- marks the resource as "Completed" (turns green when active)
-  - **Bookmark** -- saves it for later reference (turns amber when active)
-- Toggling either button instantly updates the card's visual state
-- A filter bar at the top lets you view: All | Completed | Saved for Later
-- Users must be logged in to use these actions (a subtle prompt appears otherwise)
+### 1. AI Prompt Enhancement (Backend)
+Update the `resume-analyzer` edge function's roadmap prompt to instruct the AI to return:
+- **Real, clickable URLs** for courses, articles, and documentation (not generic names)
+- A new `podcasts` array per skill with podcast name, episode/topic, and a link (Spotify/Apple/YouTube)
+- A new `websites` array per skill with curated reference sites and blogs
 
-### On the Dashboard Page
-- A new **"My Study Hub"** section appears below the Achievements card
-- Two tabs: **Completed** and **Saved for Later**
-- Each tab lists the saved resources with name, category, date marked, and a link to visit
-- A "View All" link navigates to the Resources page with the appropriate filter pre-selected
+The updated resource schema per skill becomes:
+```text
+resources: [
+  { type: "course"|"article"|"tutorial"|"documentation", name, url, isFree }
+]
+podcasts: [
+  { name: "Podcast Name", episode: "Relevant episode/topic", url: "link" }
+]
+websites: [
+  { name: "Site Name", description: "Why it's useful", url: "link" }
+]
+```
 
-## Naming Suggestion
-Instead of "Parked Items," the section is called **"My Study Hub"** -- it's friendlier and clearly communicates purpose. Sub-categories (Completed / Saved for Later) keep things organized.
+### 2. Elite-Only "Explore Resources" Gate (Frontend)
+- Pro users can generate the roadmap and see skill names, priorities, levels, and time estimates
+- The expanded detail section (resources, podcasts, websites, practice projects, certifications) will be **locked behind Elite**
+- Non-Elite users see a subtle lock overlay with an "Upgrade to Elite" prompt when they try to expand a skill
+- Elite users get the full interactive experience with clickable links
+
+### 3. Podcasts Section in Expanded Skill Card
+When an Elite user expands a skill, a new "Recommended Podcasts" section appears with:
+- Podcast name and relevant episode/topic
+- Headphones icon for visual distinction
+- Direct link to listen (opens in new tab)
+
+### 4. Websites/References Section
+A new "Useful Websites" section per skill showing:
+- Site name and brief description of why it's relevant
+- Globe icon and clickable external link
+
+### 5. "Explore on Resources Page" Button
+Add a button within each skill card that navigates Elite users to the `/resources` page with a pre-filtered search matching the skill topic (e.g., searching "system design" in the Resources Hub).
 
 ---
 
 ## Technical Details
 
-### 1. New Database Table: `user_resources`
-
-```sql
-CREATE TABLE public.user_resources (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL,
-  resource_name TEXT NOT NULL,
-  resource_category TEXT NOT NULL,
-  resource_link TEXT NOT NULL,
-  status TEXT NOT NULL CHECK (status IN ('completed', 'saved_for_later')),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE(user_id, resource_name)
-);
-
-ALTER TABLE public.user_resources ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own resources"
-  ON public.user_resources FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert own resources"
-  ON public.user_resources FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own resources"
-  ON public.user_resources FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete own resources"
-  ON public.user_resources FOR DELETE USING (auth.uid() = user_id);
-```
-
-### 2. New Hook: `src/hooks/useUserResources.ts`
-- Fetches all `user_resources` for the logged-in user
-- Provides `markCompleted(resource)`, `saveForLater(resource)`, and `removeStatus(resource)` mutation functions
-- Uses TanStack Query for caching and optimistic updates
-
-### 3. Resources Page Updates (`src/pages/Resources.tsx`)
-- Import `useUserResources` hook and auth state
-- Add a status filter bar (All / Completed / Saved for Later) next to the search input
-- Add two icon buttons (CheckCircle, Bookmark) to each resource card
-- Buttons toggle status; visual indicators show current state (green check = completed, amber bookmark = saved)
-
-### 4. Dashboard Study Hub (`src/components/dashboard/StudyHub.tsx`)
-- New component rendering a Card with two tabs
-- Each tab lists resources from `useUserResources` filtered by status
-- Shows resource name, category badge, date added, and external link
-- Empty states with CTAs to browse the Resources page
-
-### 5. Dashboard Integration (`src/pages/Dashboard.tsx`)
-- Import and render `StudyHub` component between Achievements and the CTA row
-
-### Files to Create
-- `src/hooks/useUserResources.ts`
-- `src/components/dashboard/StudyHub.tsx`
-
 ### Files to Modify
-- `src/pages/Resources.tsx` -- add action buttons and filter bar
-- `src/pages/Dashboard.tsx` -- add Study Hub section
-- Database migration for `user_resources` table
 
+**`supabase/functions/resume-analyzer/index.ts`**
+- Update the `generate-learning-roadmap` prompt to request `podcasts` and `websites` arrays per skill
+- Add explicit instructions for the AI to provide real, working URLs
+- Increase `max_tokens` from 4000 to 5000 to accommodate richer output
+
+**`src/components/practice/LearningRoadmap.tsx`**
+- Update `RoadmapSkill` interface to add `podcasts` and `websites` fields
+- Add Elite subscription check: use `useSubscription` to determine if `plan_type === 'elite'`
+- Gate the expanded skill content (resources, podcasts, websites, projects, certs) behind Elite
+- Show a locked overlay with upgrade CTA for non-Elite users clicking "More"
+- Render new Podcasts section with `Headphones` icon
+- Render new Websites section with `Globe` icon
+- Add "Explore in Resources Hub" button linking to `/resources?search={skill}`
+- Import `Headphones` and `Globe` from lucide-react
+
+### No Database Changes Required
+All data comes from the AI response -- no new tables or migrations needed.
+
+### Subscription Logic
+```text
+Current: isPremium = plan_type === 'pro' || plan_type === 'elite'
+New:     isElite = subscription?.plan_type === 'elite'
+
+- Roadmap generation: available to isPremium (Pro + Elite)
+- Explore Resources (expanded details): available to isElite only
+```
