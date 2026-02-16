@@ -8,10 +8,10 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-display font-bold text-lg">
-                IP
+                PG
               </div>
               <span className="font-display font-semibold text-lg">
-                InterviewPrep
+                PrepGenius
               </span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
@@ -49,7 +49,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-border/40 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} InterviewPrep. All rights reserved.
+            © {new Date().getFullYear()} PrepGenius. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
             Built with ❤️ for job seekers everywhere

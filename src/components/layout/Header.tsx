@@ -52,10 +52,10 @@ export function Header() {
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-display font-bold text-lg">
-              IP
+              PG
             </div>
             <span className="font-display font-semibold text-lg hidden sm:block">
-              InterviewPrep
+              PrepGenius
             </span>
           </Link>
 
