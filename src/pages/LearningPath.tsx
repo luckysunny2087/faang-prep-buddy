@@ -285,7 +285,7 @@ const LearningPath = () => {
                                                 </div>
                                             </CardContent>
                                             <CardFooter className="pt-4 mt-auto">
-                                                <Button variant="ghost" className="w-full text-xs h-8 justify-between hover:bg-primary/5 hover:text-primary" onClick={() => navigate(`/resources?search=${encodeURIComponent(stage.title)}`)}>
+                                                <Button variant="ghost" className="w-full text-xs h-8 justify-between hover:bg-primary/5 hover:text-primary" onClick={() => navigate(`/resources?search=${encodeURIComponent(stage.topics[0] || stage.title)}`)}>
                                                     Explore Resources
                                                     <ChevronRight className="h-3.5 w-3.5" />
                                                 </Button>
