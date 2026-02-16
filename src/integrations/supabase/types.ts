@@ -173,6 +173,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_resources: {
+        Row: {
+          created_at: string
+          id: string
+          resource_category: string
+          resource_link: string
+          resource_name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          resource_category: string
+          resource_link: string
+          resource_name: string
+          status: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          resource_category?: string
+          resource_link?: string
+          resource_name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useSubscription } from "@/hooks/useSubscription";
 import UpgradeBanner from "@/components/UpgradeBanner";
+import StudyHub from "@/components/dashboard/StudyHub";
 import {
   Target,
   TrendingUp,
@@ -348,6 +349,16 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+          </motion.div>
+
+          {/* My Study Hub */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+            className="mt-8"
+          >
+            <StudyHub />
           </motion.div>
 
           {/* CTA Row */}
