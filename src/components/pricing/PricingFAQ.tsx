@@ -11,28 +11,32 @@ interface FAQ {
 
 const primaryFAQs: FAQ[] = [
   {
-    question: "Can I cancel my trial anytime?",
-    answer: "Yes! Your 7-day trial is completely free. You can cancel at any point during the trial and you won't be charged a single cent.",
+    question: "Can I cancel my Basic trial anytime?",
+    answer: "Yes! Your 7-day Basic trial is completely free. You can cancel at any point during the trial and you won't be charged a single cent.",
   },
   {
-    question: "How does the yearly billing work?",
-    answer: "The Yearly Elite plan is billed as a single payment of $199/year, which works out to about $16.58/month — saving you 43% compared to paying monthly.",
+    question: "What's the difference between Pro and Elite?",
+    answer: "Pro ($14.99/mo) gives you unlimited interviews, 70+ companies, timed simulations, detailed analytics, cover letter generator, and interview tracking. Elite ($19.99/mo) includes everything in Pro plus personalized learning roadmaps, AI resume review, voice practice, PDF reports, expert guides, early feature access, and priority email support.",
   },
   {
-    question: "Can I switch plans later?",
-    answer: "Absolutely. You can upgrade from Trial to Monthly or Yearly at any time. If you're on Monthly, you can switch to Yearly and we'll prorate the difference.",
+    question: "Can I upgrade from Basic to Pro or Elite?",
+    answer: "Absolutely! You can upgrade at any time. Just go to the Pricing page or use the upgrade prompt in your Dashboard. Your interview history and progress are always preserved.",
   },
   {
-    question: "What happens when my trial ends?",
-    answer: "After 7 days, your trial expires and you'll need to choose a paid plan to continue. Your interview history and progress are saved so you can pick up right where you left off.",
+    question: "What happens when my Basic trial ends?",
+    answer: "After 7 days, your Basic trial expires and you'll need to choose Pro or Elite to continue. Your interview history and progress are saved so you can pick up right where you left off.",
   },
 ];
 
 const allFAQs: FAQ[] = [
   ...primaryFAQs,
   {
+    question: "How much can I save with Elite?",
+    answer: "Elite is just $5/month more than Pro but includes personalized roadmaps, AI resume review, voice practice, PDF reports, and priority support — saving you $60/year compared to buying these features separately.",
+  },
+  {
     question: "Do you offer refunds?",
-    answer: "Yes, we offer a 14-day money-back guarantee on all paid plans. If you're not satisfied, contact us within 14 days of purchase for a full refund.",
+    answer: "Yes, we offer a 14-day money-back guarantee on both Pro and Elite plans. If you're not satisfied, contact us within 14 days of purchase for a full refund.",
   },
   {
     question: "Is my payment information secure?",
@@ -40,11 +44,15 @@ const allFAQs: FAQ[] = [
   },
   {
     question: "Can I use the platform for multiple technologies?",
-    answer: "Yes! All plans let you practice across different technologies and roles. Monthly Pro and Yearly Elite give you access to all 70+ companies and all question domains.",
+    answer: "Yes! All plans let you practice across different technologies and roles. Pro and Elite give you access to all 70+ companies and all question domains.",
+  },
+  {
+    question: "Can I switch between Pro and Elite?",
+    answer: "Yes, you can upgrade from Pro to Elite or downgrade from Elite to Pro at any time. Changes take effect immediately with prorated billing.",
   },
   {
     question: "What's included in 'Priority AI Response Speed'?",
-    answer: "Paid plan users get faster AI processing for interview questions and feedback, meaning shorter wait times between questions during mock interviews.",
+    answer: "Pro and Elite users get faster AI processing for interview questions and feedback, meaning shorter wait times between questions during mock interviews.",
   },
   {
     question: "Do you offer team or enterprise pricing?",
