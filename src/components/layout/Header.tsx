@@ -43,6 +43,7 @@ export function Header() {
     { href: '/learning-path', label: 'Roadmap' },
     { href: '/companies', label: 'Companies' },
     { href: '/resources', label: 'Resources' },
+    { href: '/jobs', label: 'Jobs' },
     { href: '/pricing', label: 'Pricing' },
   ];
 

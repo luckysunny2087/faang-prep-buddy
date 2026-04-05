@@ -26,6 +26,7 @@ import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
 import LearningPath from "./pages/LearningPath";
 import InterviewHistory from "./pages/InterviewHistory";
+import Jobs from "./pages/Jobs";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/results" element={<ProtectedRoute><Results /></ProtectedRoute>} />
               <Route path="/history" element={<ProtectedRoute><InterviewHistory /></ProtectedRoute>} />
+              <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/companies" element={<Companies />} />
               <Route path="/resources" element={<Resources />} />
