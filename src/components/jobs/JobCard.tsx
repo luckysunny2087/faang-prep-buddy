@@ -67,7 +67,7 @@ export function JobCard({ job }: { job: Job }) {
             variant="outline"
             onClick={() =>
               window.open(
-                `https://www.google.com/search?q=${encodeURIComponent(job.title + " " + job.company + " careers apply")}`,
+                `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title + " " + job.company)}`,
                 "_blank"
               )
             }
