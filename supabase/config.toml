@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.resume-analyzer]
 verify_jwt = false
+
+[functions.job-search]
+verify_jwt = false
