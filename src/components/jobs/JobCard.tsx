@@ -62,7 +62,16 @@ export function JobCard({ job }: { job: Job }) {
             {expanded ? <ChevronUp className="h-4 w-4 mr-1" /> : <ChevronDown className="h-4 w-4 mr-1" />}
             {expanded ? "Less" : "More"}
           </Button>
-          <Button size="sm" variant="outline">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() =>
+              window.open(
+                `https://www.google.com/search?q=${encodeURIComponent(job.title + " " + job.company + " careers apply")}`,
+                "_blank"
+              )
+            }
+          >
             <ExternalLink className="h-4 w-4 mr-1" /> Apply
           </Button>
         </div>
