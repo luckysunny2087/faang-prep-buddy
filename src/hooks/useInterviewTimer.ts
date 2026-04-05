@@ -29,7 +29,7 @@ export function useInterviewTimer({
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isTimeUp, setIsTimeUp] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onTimeUpRef = useRef(onTimeUp);
 
   // Keep callback ref updated
